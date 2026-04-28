@@ -9,128 +9,153 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --bg: #f8f9fc; --surface: #fff; --border: #e8eaef; --border-s: #d0d4de;
-  --text: #1a1d2e; --text2: #5a6075; --text3: #9198b0;
-  --blue: #3b6ff5; --blue-bg: #eef2ff; --blue-b: #c7d4fd;
-  --green: #16a34a; --green-bg: #f0fdf4; --green-b: #bbf7d0;
-  --red: #dc2626; --red-bg: #fef2f2; --red-b: #fecaca;
-  --orange: #ea580c; --orange-bg: #fff7ed;
-  --yellow: #d97706; --yellow-bg: #fffbeb;
-  --purple: #7c3aed; --purple-bg: #f5f3ff;
-  --mono: 'JetBrains Mono', monospace; --sans: 'Inter', sans-serif;
-  --r: 10px; --shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
-  --shadow-md: 0 4px 12px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.04);
+  --bg:#f8f9fc; --surface:#fff; --border:#e8eaef; --border-s:#d0d4de;
+  --text:#1a1d2e; --text2:#5a6075; --text3:#9198b0;
+  --blue:#3b6ff5; --blue-bg:#eef2ff; --blue-b:#c7d4fd;
+  --green:#16a34a; --green-bg:#f0fdf4; --green-b:#bbf7d0;
+  --red:#dc2626; --red-bg:#fef2f2; --red-b:#fecaca;
+  --orange:#ea580c; --orange-bg:#fff7ed; --orange-b:#fed7aa;
+  --yellow:#d97706; --yellow-bg:#fffbeb;
+  --mono:'JetBrains Mono',monospace; --sans:'Inter',sans-serif;
+  --r:10px; --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 12px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.04);
 }
-body { font-family: var(--sans); background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
-
-/* HEADER */
-.header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 28px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-.header-left { display: flex; align-items: center; gap: 10px; }
-.header-icon { width: 30px; height: 30px; background: var(--blue-bg); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 15px; }
-.header-left h1 { font-size: 14px; font-weight: 600; }
-.header-left p { font-size: 11px; color: var(--text3); margin-top: 1px; }
-.header-right { display: flex; gap: 8px; align-items: center; }
-.nav-link { font-size: 12px; color: var(--text3); text-decoration: none; padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); transition: all .15s; }
-.nav-link:hover { color: var(--blue); border-color: var(--blue-b); }
-.live-badge { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--green); background: var(--green-bg); border: 1px solid var(--green-b); border-radius: 20px; padding: 3px 10px; }
-.live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
-
-/* PAGE */
-.page { padding: 22px 28px; max-width: 1200px; margin: 0 auto; }
-.section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--text3); margin-bottom: 12px; }
+body { font-family:var(--sans); background:var(--bg); color:var(--text); font-size:14px; line-height:1.6; -webkit-font-smoothing:antialiased; }
+.header { background:var(--surface); border-bottom:1px solid var(--border); padding:14px 28px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:100; }
+.header-left { display:flex; align-items:center; gap:10px; }
+.header-icon { width:30px; height:30px; background:var(--blue-bg); border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:15px; }
+.header-left h1 { font-size:14px; font-weight:600; }
+.header-left p { font-size:11px; color:var(--text3); margin-top:1px; }
+.header-right { display:flex; gap:8px; align-items:center; }
+.nav-link { font-size:12px; color:var(--text3); text-decoration:none; padding:5px 10px; border-radius:6px; border:1px solid var(--border); background:var(--surface); transition:all .15s; cursor:pointer; font-family:var(--sans); }
+.nav-link:hover { color:var(--blue); border-color:var(--blue-b); }
+.live-badge { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--green); background:var(--green-bg); border:1px solid var(--green-b); border-radius:20px; padding:3px 10px; }
+.live-dot { width:6px; height:6px; border-radius:50%; background:var(--green); animation:pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
+.page { padding:22px 28px; max-width:1200px; margin:0 auto; }
+.section-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--text3); margin-bottom:12px; }
 
 /* GAS FEE PANEL */
-.gas-fee-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); box-shadow: var(--shadow); padding: 20px; margin-bottom: 20px; }
-.gas-fee-grid { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 16px; align-items: end; }
-.gas-input-group { display: flex; flex-direction: column; gap: 4px; }
-.gas-input-label { font-size: 12px; font-weight: 600; color: var(--text2); }
-.gas-input-sub { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
-.gas-input { border: 1px solid var(--border-s); border-radius: 7px; padding: 8px 12px; font-family: var(--mono); font-size: 13px; color: var(--text); background: var(--bg); width: 100%; transition: border-color .15s; }
-.gas-input:focus { outline: none; border-color: var(--blue); background: var(--surface); }
-.egp-display { background: var(--blue-bg); border: 1px solid var(--blue-b); border-radius: 7px; padding: 10px 14px; }
-.egp-label { font-size: 11px; color: var(--blue); font-weight: 600; margin-bottom: 2px; }
-.egp-value { font-family: var(--mono); font-size: 18px; font-weight: 700; color: var(--blue); }
-.egp-sub { font-size: 10px; color: var(--text3); margin-top: 2px; }
-.formula-note { background: var(--yellow-bg); border: 1px solid #fde68a; border-radius: 7px; padding: 10px 14px; font-size: 12px; color: var(--yellow); margin-top: 12px; line-height: 1.5; }
-.formula-note code { background: rgba(217,119,6,.1); padding: 1px 5px; border-radius: 3px; font-family: var(--mono); font-size: 11px; }
-.presets { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
-.preset-btn { font-size: 11px; padding: 3px 10px; border-radius: 5px; border: 1px solid var(--border); background: var(--surface); color: var(--text2); cursor: pointer; transition: all .15s; font-family: var(--sans); }
-.preset-btn:hover { border-color: var(--blue); color: var(--blue); }
-.preset-btn.active { background: var(--blue-bg); border-color: var(--blue-b); color: var(--blue); font-weight: 600; }
+.gas-fee-panel { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); box-shadow:var(--shadow); padding:20px; margin-bottom:16px; }
+.gas-fee-grid { display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:16px; align-items:end; }
+.gas-input-group { display:flex; flex-direction:column; gap:4px; }
+.gas-input-label { font-size:12px; font-weight:600; color:var(--text2); }
+.gas-input-sub { font-size:11px; color:var(--text3); margin-bottom:4px; }
+.gas-input { border:1px solid var(--border-s); border-radius:7px; padding:8px 12px; font-family:var(--mono); font-size:13px; color:var(--text); background:var(--bg); width:100%; transition:border-color .15s; }
+.gas-input:focus { outline:none; border-color:var(--blue); background:var(--surface); }
+.egp-display { background:var(--blue-bg); border:1px solid var(--blue-b); border-radius:7px; padding:10px 14px; }
+.egp-label { font-size:11px; color:var(--blue); font-weight:600; margin-bottom:2px; }
+.egp-value { font-family:var(--mono); font-size:18px; font-weight:700; color:var(--blue); }
+.egp-sub { font-size:10px; color:var(--text3); margin-top:2px; }
+.formula-note { background:var(--yellow-bg); border:1px solid #fde68a; border-radius:7px; padding:10px 14px; font-size:12px; color:var(--yellow); margin-top:12px; line-height:1.5; }
+.formula-note code { background:rgba(217,119,6,.1); padding:1px 5px; border-radius:3px; font-family:var(--mono); font-size:11px; }
+.presets { display:flex; gap:5px; margin-top:6px; flex-wrap:wrap; }
+.preset-btn { font-size:11px; padding:3px 9px; border-radius:5px; border:1px solid var(--border); background:var(--surface); color:var(--text2); cursor:pointer; transition:all .15s; font-family:var(--sans); }
+.preset-btn:hover { border-color:var(--blue); color:var(--blue); }
+.preset-btn.active { background:var(--blue-bg); border-color:var(--blue-b); color:var(--blue); font-weight:600; }
 
-/* GAS REFERENCE GRID */
-.gas-ref-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin-bottom: 20px; }
-.gas-ref-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 14px; box-shadow: var(--shadow); }
-.grc-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--text3); margin-bottom: 6px; }
-.grc-gas { font-family: var(--mono); font-size: 15px; font-weight: 700; color: var(--text); line-height: 1; }
-.grc-fil { font-family: var(--mono); font-size: 11px; color: var(--blue); margin-top: 3px; }
-.grc-usd { font-size: 11px; color: var(--text3); margin-top: 1px; }
+/* GAS REF */
+.gas-ref-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(155px,1fr)); gap:10px; margin-bottom:16px; }
+.gas-ref-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); padding:12px 14px; box-shadow:var(--shadow); }
+.grc-label { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:var(--text3); margin-bottom:5px; }
+.grc-gas { font-family:var(--mono); font-size:14px; font-weight:700; color:var(--text); }
+.grc-fil { font-family:var(--mono); font-size:11px; color:var(--blue); margin-top:2px; }
+.grc-usd { font-size:11px; color:var(--text3); margin-top:1px; }
 
-/* FIL PRICE */
-.price-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-.price-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 16px; box-shadow: var(--shadow); }
-.price-card .pc-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--text3); margin-bottom: 8px; }
-.price-val { display: flex; align-items: center; gap: 8px; }
-.price-val input { border: 1px solid var(--border-s); border-radius: 6px; padding: 6px 10px; font-family: var(--mono); font-size: 13px; width: 120px; background: var(--bg); color: var(--text); }
-.price-val input:focus { outline: none; border-color: var(--blue); background: var(--surface); }
-.price-val .unit { font-size: 12px; color: var(--text3); }
-.price-live-badge { font-size: 11px; color: var(--green); background: var(--green-bg); border: 1px solid var(--green-b); border-radius: 5px; padding: 2px 8px; }
+/* PRICE ROW */
+.price-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px; }
+.price-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); padding:14px 16px; box-shadow:var(--shadow); }
+.price-card .pc-label { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:var(--text3); margin-bottom:7px; }
+.price-val { display:flex; align-items:center; gap:7px; }
+.price-val input { border:1px solid var(--border-s); border-radius:6px; padding:6px 10px; font-family:var(--mono); font-size:13px; width:110px; background:var(--bg); color:var(--text); }
+.price-val input:focus { outline:none; border-color:var(--blue); background:var(--surface); }
+.price-val .unit { font-size:12px; color:var(--text3); }
+.price-live-badge { font-size:11px; color:var(--green); background:var(--green-bg); border:1px solid var(--green-b); border-radius:5px; padding:2px 7px; }
 
-/* USAGE PARAMS */
-.usage-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow); }
-.usage-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-.param-group { display: flex; flex-direction: column; gap: 6px; }
-.param-label { font-size: 12px; font-weight: 600; color: var(--text2); }
-.param-sub { font-size: 11px; color: var(--text3); }
-.param-input { border: 1px solid var(--border-s); border-radius: 6px; padding: 7px 10px; font-family: var(--mono); font-size: 13px; color: var(--text); background: var(--bg); width: 100%; }
-.param-input:focus { outline: none; border-color: var(--blue); background: var(--surface); }
-.param-slider { width: 100%; accent-color: var(--blue); margin-top: 2px; }
+/* FLOOR PRICE */
+.floor-box { background:var(--blue-bg); border:1px solid var(--blue-b); border-radius:var(--r); padding:12px 16px; margin-bottom:16px; font-size:12px; color:var(--text2); line-height:1.6; }
+.floor-box code { background:rgba(59,111,245,.1); padding:1px 5px; border-radius:3px; font-family:var(--mono); font-size:11px; color:var(--blue); }
 
-/* COST BREAKDOWN */
-.breakdown-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); box-shadow: var(--shadow-md); margin-bottom: 20px; overflow: hidden; }
-.breakdown-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-.breakdown-title { font-size: 14px; font-weight: 600; }
-.breakdown-sub { font-size: 12px; color: var(--text3); }
-table.bt { width: 100%; border-collapse: collapse; font-size: 13px; }
-table.bt thead th { text-align: left; padding: 9px 14px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--text3); background: var(--bg); border-bottom: 1px solid var(--border); }
-table.bt thead th.tr { text-align: right; }
-table.bt tbody td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--text2); }
-table.bt tbody tr:last-child td { border-bottom: none; }
-table.bt tbody tr:hover td { background: var(--bg); }
-table.bt tfoot td { padding: 10px 14px; font-weight: 700; color: var(--text); background: var(--bg); border-top: 2px solid var(--border-s); }
-.mono { font-family: var(--mono); font-size: 12px; }
-.tr { text-align: right; }
+/* HIST EGP */
+.hist-egp-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+.hist-egp-card { background:var(--bg); border:1px solid var(--border); border-radius:7px; padding:7px 12px; min-width:90px; }
+.hist-egp-label { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text3); margin-bottom:2px; }
+.hist-egp-val { font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); }
 
-/* COST DETAIL — the new section showing full cost breakdown per operation */
-.cost-detail { padding: 16px 20px; border-top: 1px solid var(--border); background: var(--bg); }
-.cost-detail-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--text3); margin-bottom: 10px; }
-.cost-detail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
-.cdc { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
-.cdc-op { font-size: 11px; font-weight: 700; color: var(--text); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .04em; }
-.cdc-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; border-bottom: 1px solid var(--border); font-size: 11px; }
-.cdc-row:last-child { border-bottom: none; padding-top: 6px; margin-top: 2px; font-weight: 700; }
-.cdc-key { color: var(--text3); }
-.cdc-val { font-family: var(--mono); color: var(--text); }
-.cdc-val.burn { color: var(--red); }
-.cdc-val.tip { color: var(--orange); }
-.cdc-val.total { color: var(--blue); font-size: 12px; }
+/* USAGE PANEL */
+.usage-panel { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); padding:20px; margin-bottom:16px; box-shadow:var(--shadow); }
+.usage-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+.param-group { display:flex; flex-direction:column; gap:4px; }
+.param-label { font-size:12px; font-weight:600; color:var(--text2); }
+.param-sub { font-size:11px; color:var(--text3); }
+.param-input { border:1px solid var(--border-s); border-radius:6px; padding:7px 10px; font-family:var(--mono); font-size:13px; color:var(--text); background:var(--bg); width:100%; }
+.param-input:focus { outline:none; border-color:var(--blue); background:var(--surface); }
+.param-slider { width:100%; accent-color:var(--blue); margin-top:3px; }
+
+/* BREAKDOWN */
+.breakdown-panel { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); box-shadow:var(--shadow-md); margin-bottom:16px; overflow:hidden; }
+.breakdown-header { padding:14px 18px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+table.bt { width:100%; border-collapse:collapse; font-size:13px; }
+table.bt thead th { text-align:left; padding:8px 14px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:var(--text3); background:var(--bg); border-bottom:1px solid var(--border); }
+table.bt thead th.tr { text-align:right; }
+table.bt tbody td { padding:9px 14px; border-bottom:1px solid var(--border); color:var(--text2); }
+table.bt tbody tr:last-child td { border-bottom:none; }
+table.bt tbody tr:hover td { background:var(--bg); }
+table.bt tfoot td { padding:9px 14px; font-weight:700; color:var(--text); background:var(--bg); border-top:2px solid var(--border-s); }
+.mono { font-family:var(--mono); font-size:12px; }
+.tr { text-align:right; }
+
+/* COST DETAIL */
+.cost-detail { padding:14px 18px; border-top:1px solid var(--border); background:var(--bg); }
+.cost-detail-title { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:var(--text3); margin-bottom:10px; }
+.cost-detail-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:10px; }
+.cdc { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:11px; }
+.cdc-op { font-size:10px; font-weight:700; color:var(--text); margin-bottom:7px; text-transform:uppercase; letter-spacing:.04em; }
+.cdc-row { display:flex; justify-content:space-between; padding:3px 0; border-bottom:1px solid var(--border); font-size:11px; }
+.cdc-row:last-child { border-bottom:none; padding-top:5px; font-weight:700; }
+.cdc-key { color:var(--text3); }
+.cdc-val { font-family:var(--mono); color:var(--text); }
+.cdc-val.burn { color:var(--red); }
+.cdc-val.tip { color:var(--orange); }
+.cdc-val.total { color:var(--blue); font-size:12px; }
 
 /* SUMMARY */
-.summary-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
-.sum-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 16px; box-shadow: var(--shadow); }
-.sum-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; color: var(--text3); margin-bottom: 5px; }
-.sum-value { font-family: var(--mono); font-size: 20px; font-weight: 700; color: var(--text); line-height: 1; letter-spacing: -.02em; }
-.sum-sub { font-size: 11px; color: var(--text3); margin-top: 4px; }
+.summary-row { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:16px; }
+.sum-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); padding:14px 16px; box-shadow:var(--shadow); }
+.sum-label { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.07em; color:var(--text3); margin-bottom:5px; }
+.sum-value { font-family:var(--mono); font-size:19px; font-weight:700; color:var(--text); line-height:1; letter-spacing:-.02em; }
+.sum-sub { font-size:11px; color:var(--text3); margin-top:3px; }
 
-/* TOOLTIP / INFO */
-.info-box { background: var(--blue-bg); border: 1px solid var(--blue-b); border-radius: 8px; padding: 12px 16px; font-size: 12px; color: var(--blue); line-height: 1.6; margin-bottom: 20px; }
-.info-box code { background: rgba(59,111,245,.1); padding: 1px 5px; border-radius: 3px; font-family: var(--mono); font-size: 11px; }
+/* INFO BOX */
+.info-box { background:var(--blue-bg); border:1px solid var(--blue-b); border-radius:8px; padding:10px 14px; font-size:12px; color:var(--text2); line-height:1.6; margin-bottom:14px; }
+.info-box code { background:rgba(59,111,245,.1); padding:1px 5px; border-radius:3px; font-family:var(--mono); font-size:11px; color:var(--blue); }
 
-/* LOADING */
-.loading { display: flex; align-items: center; gap: 6px; color: var(--text3); font-size: 12px; }
-.spinner { width: 14px; height: 14px; border: 2px solid var(--border); border-top-color: var(--blue); border-radius: 50%; animation: spin .7s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
+/* BATCHING TABLE */
+.batch-table { width:100%; border-collapse:collapse; font-size:12px; }
+.batch-table th { text-align:left; padding:6px 12px; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:var(--text3); background:var(--bg); border-bottom:1px solid var(--border); }
+.batch-table th.tr,.batch-table td.tr { text-align:right; }
+.batch-table td { padding:6px 12px; border-bottom:1px solid var(--border); }
+.batch-table tr:last-child td { border-bottom:none; }
+
+.loading { display:flex; align-items:center; gap:6px; color:var(--text3); font-size:12px; }
+.spinner { width:14px; height:14px; border:2px solid var(--border); border-top-color:var(--blue); border-radius:50%; animation:spin .7s linear infinite; }
+@keyframes spin { to{transform:rotate(360deg)} }
+
+.warn-box { background:var(--orange-bg); border:1px solid var(--orange-b); border-radius:6px; padding:6px 10px; font-size:11px; color:var(--orange); margin-top:4px; display:none; }
+.warn-box.show { display:block; }
+
+/* FULL REF TABLE */
+.ref-table { width:100%; border-collapse:collapse; font-size:12px; }
+.ref-table th { text-align:left; padding:7px 14px; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:var(--text3); background:var(--bg); border-bottom:1px solid var(--border); }
+.ref-table th.tr { text-align:right; }
+.ref-table td { padding:8px 14px; border-bottom:1px solid var(--border); color:var(--text2); font-size:12px; vertical-align:top; }
+.ref-table td.tr { text-align:right; font-family:var(--mono); }
+.ref-table tr:last-child td { border-bottom:none; }
+.ref-table tr:hover td { background:var(--bg); }
+.tag { display:inline-block; padding:1px 6px; border-radius:4px; font-size:10px; font-weight:600; }
+.tag-sp { background:#ede9fe; color:#6d28d9; }
+.tag-client { background:#dcfce7; color:#166534; }
+.tag-one { background:#fef3c7; color:#92400e; }
 </style>
 </head>
 <body>
@@ -139,27 +164,28 @@ table.bt tfoot td { padding: 10px 14px; font-weight: 700; color: var(--text); ba
   <div class="header-left">
     <div class="header-icon">⚡</div>
     <div>
-      <h1>FWSS Gas & Cost Calculator</h1>
+      <h1>FWSS Gas &amp; Cost Calculator</h1>
       <p>Real costs for every FWSS operation · Filecoin mainnet · live data</p>
     </div>
   </div>
   <div class="header-right">
     <div class="live-badge"><div class="live-dot"></div><span id="status-txt">Loading...</span></div>
+    <button class="nav-link" onclick="init()">↺ Refresh</button>
     <a href="capacity.html" class="nav-link">📡 Capacity</a>
-    <a href="extreme_modeling.html" class="nav-link">⚡ Extreme</a>
+    <a href="extreme_modeling.html" class="nav-link">🔴 Extreme</a>
     <a href="index.html" class="nav-link">← Index</a>
   </div>
 </div>
 
 <div class="page">
 
-  <!-- GAS FEE MODEL -->
+  <!-- GAS FEE PARAMS -->
   <div class="section-title">Gas fee parameters</div>
   <div class="gas-fee-panel">
     <div class="gas-fee-grid">
       <div class="gas-input-group">
         <div class="gas-input-label">Base fee <span style="font-weight:400;color:var(--text3)">(attoFIL/gas)</span></div>
-        <div class="gas-input-sub">Set by the network. Today ≈ 100.</div>
+        <div class="gas-input-sub">Set by network. Today ≈ 100.</div>
         <input class="gas-input" type="number" id="inp-basefee" value="100" min="100" step="100" oninput="onGasFeeChange()">
         <div class="presets" id="bf-presets">
           <button class="preset-btn active" onclick="setPreset('bf',100,this)">Today (~100)</button>
@@ -170,7 +196,7 @@ table.bt tfoot td { padding: 10px 14px; font-weight: 700; color: var(--text); ba
       </div>
       <div class="gas-input-group">
         <div class="gas-input-label">Gas premium <span style="font-weight:400;color:var(--text3)">(attoFIL/gas)</span></div>
-        <div class="gas-input-sub">Tip to SP (Storage Provider). Min ~100,000. Avg 30d: 252,105.</div>
+        <div class="gas-input-sub">Tip to SP. Min ~100,000. Avg 30d: 252,105.</div>
         <input class="gas-input" type="number" id="inp-premium" value="252105" min="100000" step="10000" oninput="onGasFeeChange()">
         <div class="presets" id="prem-presets">
           <button class="preset-btn active" onclick="setPreset('prem',252105,this)">30d avg</button>
@@ -197,72 +223,49 @@ table.bt tfoot td { padding: 10px 14px; font-weight: 700; color: var(--text); ba
         </div>
       </div>
     </div>
-    <div class="formula-note">
-      <strong>Formula (from Lotus source):</strong>
+    <div class="formula-note" style="margin-top:12px">
+      <strong>Formula (Lotus source):</strong>
       <code>effective_gas_price = BaseFee + min(GasPremium, GasFeeCap − BaseFee)</code><br>
-      Total tx cost = <code>GasUsed × BaseFee</code> (burned) + <code>GasUsed × effective_premium</code> (to SP) + overestimation burn on unused gas above 10% tolerance.<br>
-      Today (pre FIP-0115) with BaseFee ≈ 100 attoFIL, the SP premium dominates (~99.9% of the fee is burned as burn+tip, but mostly tip). Under FIP-0115 (Draft), BaseFee would rise to ~90% of EGP — burn dominates, SPs earn less tip. Use the toggle below to model both scenarios.
+      Total tx cost = <code>GasUsed × BaseFee</code> (burned to f099) + <code>GasUsed × effective_premium</code> (to SP) + overestimation burn.<br>
+      Today (pre FIP-0115): SP premium dominates (~99.9% of fee). Under FIP-0115 (Draft): BaseFee rises to ~90% of EGP.
     </div>
-
-    <!-- FIP-0115 TOGGLE -->
-    <div style="display:flex;align-items:center;gap:12px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
-      <span style="font-size:12px;font-weight:600;color:var(--text2)">Gas market regime:</span>
-      <div style="display:flex;gap:6px">
-        <button class="preset-btn active" id="fip-pre" onclick="setFIPRegime('pre',this)">
-          Pre FIP-0115 <span style="font-weight:400;color:var(--text3)">(today — premium dominates)</span>
-        </button>
-        <button class="preset-btn" id="fip-post" onclick="setFIPRegime('post',this)">
-          Post FIP-0115 <span style="font-weight:400;color:var(--text3)">(draft — BaseFee rises)</span>
-        </button>
-      </div>
-      <div style="font-size:11px;color:var(--text3)" id="fip-note">BaseFee ≈ 0.04% of effective gas price today</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+      <span style="font-size:12px;font-weight:600;color:var(--text2)">Regime:</span>
+      <button class="preset-btn active" id="fip-pre" onclick="setFIPRegime('pre',this)">Pre FIP-0115 (today)</button>
+      <button class="preset-btn" id="fip-post" onclick="setFIPRegime('post',this)">Post FIP-0115 (draft estimate)</button>
+      <span style="font-size:11px;color:var(--text3)" id="fip-note">BaseFee ≈ 0.04% of EGP today</span>
     </div>
   </div>
 
   <!-- HISTORICAL EGP + CDN -->
-  <div style="display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start;margin-bottom:20px">
+  <div style="display:grid;grid-template-columns:1fr auto;gap:14px;margin-bottom:16px">
     <div class="gas-fee-panel" style="margin-bottom:0">
       <div class="section-title" style="margin-bottom:8px">Historical effective gas price (from real FWSS transactions)</div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap" id="hist-egp-row">
-        <div style="background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:8px 14px;min-width:100px">
-          <div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">24h avg</div>
-          <div style="font-family:var(--mono);font-size:14px;font-weight:700" id="egp-24h">—</div>
-        </div>
-        <div style="background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:8px 14px;min-width:100px">
-          <div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">30d avg</div>
-          <div style="font-family:var(--mono);font-size:14px;font-weight:700" id="egp-30d">—</div>
-        </div>
-        <div style="background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:8px 14px;min-width:100px">
-          <div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">90d avg</div>
-          <div style="font-family:var(--mono);font-size:14px;font-weight:700" id="egp-90d">—</div>
-        </div>
-        <div style="background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:8px 14px;min-width:100px">
-          <div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">observed min</div>
-          <div style="font-family:var(--mono);font-size:14px;font-weight:700" id="egp-min">—</div>
-        </div>
-        <div style="background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:8px 14px;min-width:100px">
-          <div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">observed max</div>
-          <div style="font-family:var(--mono);font-size:14px;font-weight:700" id="egp-max">—</div>
-        </div>
+      <div class="hist-egp-row">
+        <div class="hist-egp-card"><div class="hist-egp-label">24h avg</div><div class="hist-egp-val" id="egp-24h">—</div></div>
+        <div class="hist-egp-card"><div class="hist-egp-label">30d avg</div><div class="hist-egp-val" id="egp-30d">—</div></div>
+        <div class="hist-egp-card"><div class="hist-egp-label">90d avg</div><div class="hist-egp-val" id="egp-90d">—</div></div>
+        <div class="hist-egp-card"><div class="hist-egp-label">Min observed</div><div class="hist-egp-val" id="egp-min">—</div></div>
+        <div class="hist-egp-card"><div class="hist-egp-label">Max observed</div><div class="hist-egp-val" id="egp-max">—</div></div>
         <button class="preset-btn" style="align-self:center" onclick="applyHistEGP('24h')">Use 24h avg</button>
         <button class="preset-btn" style="align-self:center" onclick="applyHistEGP('30d')">Use 30d avg</button>
       </div>
     </div>
-    <div class="gas-fee-panel" style="margin-bottom:0;min-width:200px">
+    <div class="gas-fee-panel" style="margin-bottom:0;min-width:190px">
       <div class="section-title" style="margin-bottom:8px">CDN dataset</div>
-      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--text2)">
-        <input type="checkbox" id="cdn-toggle" onchange="recalc()" style="width:16px;height:16px;accent-color:var(--blue)">
-        Dataset has CDN enabled
+      <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-size:13px;color:var(--text2)">
+        <input type="checkbox" id="cdn-toggle" onchange="recalc()" style="width:15px;height:15px;accent-color:var(--blue)">
+        CDN enabled
       </label>
       <div style="font-size:11px;color:var(--text3);margin-top:6px;line-height:1.5">
-        CDN datasets use 3 FilecoinPay rails instead of 1.<br>
-        createDataSet: +45M gas (~840M total)<br>
-        terminateService: +105M gas (~241M total)
+        3 FilecoinPay rails instead of 1.<br>
+        createDataSet: +45M (~840M total)<br>
+        terminateService: +105M (~241M total)
       </div>
     </div>
   </div>
 
-  <!-- FIL PRICE -->
+  <!-- FIL PRICE + PERIOD -->
   <div class="price-row">
     <div class="price-card">
       <div class="pc-label">FIL price (USD)</div>
@@ -282,186 +285,155 @@ table.bt tfoot td { padding: 10px 14px; font-weight: 700; color: var(--text); ba
     </div>
   </div>
 
-  <!-- GAS REFERENCE -->
-  <div class="section-title">Gas per operation (live from FOC Observer)</div>
+  <!-- FLOOR PRICE -->
+  <div class="floor-box">
+    <strong>Minimum floor price</strong> — minimum a client must pay per dataset per 30 days to cover SP daily proving gas.<br>
+    Formula: <code>(gas_PP(N) + gas_NPP) × effective_gas_price ÷ 10¹⁸ × FIL_price × 30</code><br>
+    <span id="floor-price-val" style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--blue)">—</span>
+    <span style="color:var(--text3);font-size:12px;margin-left:6px" id="floor-price-sub"></span>
+  </div>
+
+  <!-- GAS REFERENCE GRID -->
+  <div class="section-title">Gas per operation (30d avg · live from FOC Observer)</div>
   <div class="gas-ref-grid" id="gas-ref-grid">
     <div class="loading"><div class="spinner"></div>Loading...</div>
   </div>
 
   <!-- BATCHING TABLE -->
-  <div class="gas-fee-panel" style="margin-bottom:20px">
+  <div class="gas-fee-panel" style="margin-bottom:16px">
     <div class="section-title" style="margin-bottom:10px">addPieces batching savings (observed mainnet data)</div>
     <div style="overflow-x:auto">
-      <table style="width:100%;border-collapse:collapse;font-size:12px">
-        <thead><tr>
-          <th style="text-align:left;padding:7px 12px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);background:var(--bg);border-bottom:1px solid var(--border)">Batch size</th>
-          <th style="text-align:right;padding:7px 12px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);background:var(--bg);border-bottom:1px solid var(--border)">Gas/tx</th>
-          <th style="text-align:right;padding:7px 12px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);background:var(--bg);border-bottom:1px solid var(--border)">Gas/piece</th>
-          <th style="text-align:right;padding:7px 12px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);background:var(--bg);border-bottom:1px solid var(--border)">Saving vs ×1</th>
-          <th style="text-align:left;padding:7px 12px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);background:var(--bg);border-bottom:1px solid var(--border)">Source</th>
-        </tr></thead>
-        <tbody id="batch-tbody"></tbody>
-      </table>
+      <table class="batch-table"><thead><tr>
+        <th>Batch size</th><th class="tr">Gas/tx</th><th class="tr">Gas/piece</th><th class="tr">Saving vs ×1</th><th>Source</th>
+      </tr></thead><tbody id="batch-tbody"></tbody></table>
     </div>
-    <div style="font-size:11px;color:var(--text3);margin-top:8px">
-      Beyond ×10: no mainnet observations. Model extrapolated linearly (215M + 66M × K) — consistent with FVM SSTORE cost per piece but unverified.
-    </div>
+    <div style="font-size:11px;color:var(--text3);margin-top:8px">Beyond ×10: no mainnet observations. Model extrapolated: 215M + 66M × K. Beyond ×368: tx exceeds tipset budget → stuck forever.</div>
   </div>
 
-  <!-- USAGE PARAMETERS -->
-  <div class="section-title">Usage parameters <span style="font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0">— define your volume to compute total costs below</span></div>
+  <!-- USAGE PARAMS -->
+  <div class="section-title">Usage parameters <span style="font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0">— define your volume · gas values above are unit costs · costs below = unit × volume</span></div>
   <div class="usage-panel">
     <div class="usage-grid">
       <div class="param-group">
         <div class="param-label">Datasets <span style="color:var(--text3);font-weight:400">→ proving costs</span></div>
         <div class="param-sub">Number of active FWSS datasets</div>
-        <input class="param-input" type="number" id="inp-ds" value="10" min="1" max="100000" oninput="recalc()">
+        <input class="param-input" type="number" id="inp-ds" value="10" min="1" oninput="recalc()">
       </div>
       <div class="param-group">
         <div class="param-label">Pieces per dataset <span style="color:var(--text3);font-weight:400">→ provePossession gas</span></div>
         <div class="param-sub">Drives gas via log₂(N) model</div>
-        <input class="param-input" type="number" id="inp-pieces" value="100" min="1" max="1000000" oninput="recalc()">
-        <input class="param-slider" type="range" id="sl-pieces" min="0" max="20" value="6" step="0.1" oninput="syncSlider()">
-        <div style="font-size:10px;color:var(--text3)" id="pieces-note">log₂ scale</div>
+        <input class="param-input" type="number" id="inp-pieces" value="100" min="1" oninput="syncFromInput();recalc()">
+        <input class="param-slider" type="range" id="sl-pieces" min="0" max="20" value="6.64" step="0.1" oninput="syncFromSlider()">
       </div>
       <div class="param-group">
         <div class="param-label">Pieces to add <span style="color:var(--text3);font-weight:400">→ addPieces cost</span></div>
         <div class="param-sub">Total uploads during period</div>
         <input class="param-input" type="number" id="inp-add" value="1000" min="0" oninput="recalc()">
+        <input class="param-slider" type="range" id="sl-add" min="0" max="100000" value="1000" step="100" oninput="document.getElementById('inp-add').value=this.value;recalc()">
       </div>
       <div class="param-group">
-        <div class="param-label">Batch size <span style="color:var(--text3);font-weight:400">→ pieces per tx</span></div>
-        <div class="param-sub">Larger batches = cheaper per piece. <strong style="color:var(--orange)">K&gt;10: extrapolated. K&gt;368: stuck forever.</strong></div>
+        <div class="param-label">Batch size <span style="color:var(--text3);font-weight:400">→ pieces per addPieces tx</span></div>
+        <div class="param-sub">Larger = cheaper per piece. <strong style="color:var(--orange)">K&gt;10: extrapolated. K&gt;368: stuck.</strong></div>
         <input class="param-input" type="number" id="inp-batch" value="1" min="1" max="368" oninput="recalc();checkBatch()">
-      </div>
-      <div id="batch-warn" style="display:none;font-size:11px;padding:5px 10px;background:var(--orange-bg);border:1px solid var(--orange-b);border-radius:5px;color:var(--orange);margin-top:4px">
-        ⚠ Beyond ×10: no mainnet data — linear extrapolation. Beyond ×368: tx exceeds tipset budget and would be stuck forever.
-      </div>
+        <div class="warn-box" id="batch-warn">⚠ Beyond ×10: no mainnet data — linear extrapolation (215M + 66M×K). Beyond ×368: tx exceeds tipset budget → stuck forever.</div>
       </div>
       <div class="param-group">
         <div class="param-label">Pieces to remove <span style="color:var(--text3);font-weight:400">→ removePieces cost</span></div>
-        <div class="param-sub">Removals per observation period</div>
+        <div class="param-sub">Removals per period (per tx)</div>
         <input class="param-input" type="number" id="inp-rem" value="0" min="0" oninput="recalc()">
+        <input class="param-slider" type="range" id="sl-rem" min="0" max="1000" value="0" step="1" oninput="document.getElementById('inp-rem').value=this.value;recalc()">
       </div>
       <div class="param-group">
-        <div class="param-label">SP settlement ratio <span style="color:var(--text3);font-weight:400">→ NPP cost</span></div>
-        <div class="param-sub">Fraction of datasets settled per NPP</div>
-        <input class="param-input" type="number" id="inp-settle" value="1" min="0" max="1" step="0.1" oninput="recalc()">
+        <div class="param-label">Observation period <span style="color:var(--text3);font-weight:400">→ multiplies all costs</span></div>
+        <div class="param-sub">How many days to model</div>
+        <input class="param-input" type="number" id="inp-days2" value="30" min="1" max="365" oninput="document.getElementById('inp-days').value=this.value;recalc()">
       </div>
     </div>
   </div>
 
-  <!-- COST BREAKDOWN TABLE -->
+  <!-- COST BREAKDOWN -->
   <div class="breakdown-panel">
     <div class="breakdown-header">
-      <div class="breakdown-title">Cost breakdown</div>
-      <div class="breakdown-sub" id="breakdown-sub">—</div>
+      <div style="font-size:14px;font-weight:600">Cost breakdown</div>
+      <div style="font-size:12px;color:var(--text3)" id="breakdown-sub">—</div>
     </div>
     <div style="overflow-x:auto">
       <table class="bt">
-        <thead>
-          <tr>
-            <th style="width:25%">Operation</th>
-            <th class="tr">Txns</th>
-            <th class="tr">Gas/tx</th>
-            <th class="tr">Total gas</th>
-            <th class="tr">FIL cost</th>
-            <th class="tr">USD</th>
-          </tr>
-        </thead>
+        <thead><tr>
+          <th style="width:25%">Operation</th>
+          <th class="tr">Txns</th><th class="tr">Gas/tx</th><th class="tr">Total gas</th>
+          <th class="tr">FIL cost</th><th class="tr">USD</th>
+        </tr></thead>
         <tbody id="cost-tbody"></tbody>
-        <tfoot>
-          <tr>
-            <td colspan="3" style="font-size:12px;color:var(--text3)">Total</td>
-            <td class="tr mono" id="tot-gas">—</td>
-            <td class="tr mono" id="tot-fil">—</td>
-            <td class="tr mono" id="tot-usd">—</td>
-          </tr>
-        </tfoot>
+        <tfoot><tr>
+          <td colspan="3" style="font-size:12px;color:var(--text3)">Total</td>
+          <td class="tr mono" id="tot-gas">—</td>
+          <td class="tr mono" id="tot-fil">—</td>
+          <td class="tr mono" id="tot-usd">—</td>
+        </tr></tfoot>
       </table>
     </div>
-
-    <!-- COST DETAIL per operation -->
     <div class="cost-detail">
-      <div class="cost-detail-title">Transaction cost breakdown per operation (burn + SP tip)</div>
+      <div class="cost-detail-title">Burn + SP tip breakdown per operation (per single tx)</div>
       <div class="cost-detail-grid" id="cost-detail-grid"></div>
     </div>
   </div>
 
   <!-- SUMMARY -->
   <div class="summary-row">
-    <div class="sum-card">
-      <div class="sum-label">Daily gas (all datasets)</div>
-      <div class="sum-value" id="sum-daily-gas">—</div>
-      <div class="sum-sub" id="sum-daily-pct">—</div>
+    <div class="sum-card"><div class="sum-label">Daily gas (all datasets)</div><div class="sum-value" id="sum-daily-gas">—</div><div class="sum-sub" id="sum-daily-pct">—</div></div>
+    <div class="sum-card"><div class="sum-label">Daily cost (FIL)</div><div class="sum-value" id="sum-daily-fil">—</div><div class="sum-sub" id="sum-daily-usd">—</div></div>
+    <div class="sum-card"><div class="sum-label">Per dataset / month</div><div class="sum-value" id="sum-per-ds">—</div><div class="sum-sub">proving only</div></div>
+    <div class="sum-card"><div class="sum-label">Cost per piece added</div><div class="sum-value" id="sum-per-piece">—</div><div class="sum-sub" id="sum-per-piece-sub">—</div></div>
+  </div>
+
+  <!-- USD COST CHART -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;box-shadow:var(--shadow);margin-bottom:16px">
+    <div class="section-title" style="margin-bottom:12px">USD cost by operation</div>
+    <canvas id="cost-chart" height="110" style="width:100%"></canvas>
+  </div>
+
+  <!-- FULL REFERENCE TABLE -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);margin-bottom:16px;overflow:hidden">
+    <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+      <div style="font-size:14px;font-weight:600">Complete gas reference — all operations</div>
+      <div style="font-size:12px;color:var(--text3)">30d avg from FOC Observer</div>
     </div>
-    <div class="sum-card">
-      <div class="sum-label">Daily cost (FIL)</div>
-      <div class="sum-value" id="sum-daily-fil">—</div>
-      <div class="sum-sub" id="sum-daily-usd">—</div>
-    </div>
-    <div class="sum-card">
-      <div class="sum-label">Per dataset / month</div>
-      <div class="sum-value" id="sum-per-ds">—</div>
-      <div class="sum-sub">proving only</div>
-    </div>
-    <div class="sum-card">
-      <div class="sum-label">Cost per piece added</div>
-      <div class="sum-value" id="sum-per-piece">—</div>
-      <div class="sum-sub" id="sum-per-piece-sub">—</div>
+    <div style="overflow-x:auto">
+      <table class="ref-table">
+        <thead><tr>
+          <th>Operation</th><th class="tr">Avg gas (30d)</th><th class="tr">FIL/tx</th><th class="tr">USD/tx</th><th>Who pays</th><th>When</th>
+        </tr></thead>
+        <tbody id="ref-tbody"><tr><td colspan="6" style="text-align:center;padding:18px;color:var(--text3)">Loading...</td></tr></tbody>
+      </table>
     </div>
   </div>
 
   <!-- METHODOLOGY -->
-  <details style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:20px;box-shadow:var(--shadow)">
-    <summary style="padding:16px 20px;cursor:pointer;font-size:14px;font-weight:600;list-style:none;display:flex;justify-content:space-between;align-items:center;user-select:none">
+  <details id="methodology" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:20px;box-shadow:var(--shadow)">
+    <summary style="padding:14px 18px;cursor:pointer;font-size:14px;font-weight:600;list-style:none;display:flex;justify-content:space-between;align-items:center;user-select:none">
       Methodology — how the models work
       <span style="font-size:12px;color:var(--text3);font-weight:400">click to expand</span>
     </summary>
     <div style="padding:0 20px 20px;border-top:1px solid var(--border)">
-
       <div style="margin-top:16px">
         <div style="font-size:13px;font-weight:600;margin-bottom:8px">provePossession model</div>
-        <div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:12px">
-          Gas scales logarithmically with piece count N (number of Merkle roots in the dataset).
-          This is because provePossession traverses a Sum Tree of depth log₂(N) on-chain — 5 challenges × O(log₂N) SLOAD operations.
-          Piece <em>size</em> (leafCount) is irrelevant — it's stored as a value in Sum Tree nodes for proportional sampling, not as tree depth.
-        </div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:10px">Gas scales logarithmically with piece count N (number of Merkle roots). provePossession traverses a Sum Tree of depth log₂(N) on-chain — 5 challenges × O(log₂N) SLOAD operations. Piece <em>size</em> (leafCount) is irrelevant — it's a value in Sum Tree nodes for proportional sampling, not tree depth.</div>
         <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 16px;font-family:var(--mono);font-size:13px;margin-bottom:12px">
           gas = 158.67M + 8.485M × log₂(pieces)<br>
-          <span style="font-size:11px;color:var(--text3)">R² = 0.9551 · MAE = 4.8M gas · fitted on 670 real mainnet datasets · refitted daily</span>
+          <span style="font-size:11px;color:var(--text3)">R² = 0.9551 · MAE = 4.8M gas · 670 real mainnet datasets · refitted daily</span>
         </div>
-        <!-- PP model chart -->
-        <canvas id="pp-chart" width="600" height="200" style="width:100%;max-width:600px;border:1px solid var(--border);border-radius:8px;background:var(--bg)"></canvas>
+        <canvas id="pp-chart" width="700" height="200" style="width:100%;max-width:700px;border:1px solid var(--border);border-radius:8px;background:var(--bg)"></canvas>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px">Binned averages from 870 real mainnet datasets. Vertical lines = deviation from model.</div>
       </div>
-
-      <div style="margin-top:20px">
+      <div style="margin-top:18px">
         <div style="font-size:13px;font-weight:600;margin-bottom:8px">removePieces model</div>
-        <div style="font-size:12px;color:var(--text2);line-height:1.7">
-          Gas scales sublinearly with K (pieces removed per tx) because within the same transaction, multiple pieces share Sum Tree ancestor nodes — warm access costs ~200 gas instead of ~5,000.
-          The O(K × log₂N) theoretical formula from the contract code is not clearly confirmed by observed data (N is not tracked at removal time in FOC Observer).
-          Both calculators use the same model: observed values for K≤144, linear interpolation between observed points, K^0.614 extrapolation beyond K=144 (unobserved).
-        </div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.7">Gas scales sublinearly with K (pieces removed per tx) — multiple pieces share Sum Tree ancestor nodes in the same tx (warm access: ~200 gas vs ~5,000). O(K × log₂N) theoretical formula not clearly confirmed by observed data (N not tracked at removal time in FOC Observer). Model: observed values for K≤144, linear interpolation between points, K^0.614 extrapolation beyond K=144.</div>
       </div>
-
-      <div style="margin-top:20px">
+      <div style="margin-top:18px">
         <div style="font-size:13px;font-weight:600;margin-bottom:8px">Gas fee model</div>
-        <div style="font-size:12px;color:var(--text2);line-height:1.7">
-          From <a href="https://github.com/filecoin-project/lotus/blob/master/chain/types/message.go" target="_blank" style="color:var(--blue)">Lotus source</a>:
-          <code style="background:var(--bg);border:1px solid var(--border);padding:1px 6px;border-radius:3px;font-size:11px">effective_gas_price = BaseFee + min(GasPremium, GasFeeCap − BaseFee)</code><br>
-          Total cost = GasUsed × BaseFee (burned) + GasUsed × effective_premium (to SP) + overestimation burn.<br>
-          Today: BaseFee ≈ 100 attoFIL, GasPremium ≈ 252,000 → SP tip dominates (99.9% of fee).
-          Under FIP-0115 (Draft): BaseFee would rise to ~90% of EGP.
-        </div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.7">From <a href="https://github.com/filecoin-project/lotus/blob/master/chain/types/message.go" target="_blank" style="color:var(--blue)">Lotus source</a>: <code style="background:var(--bg);border:1px solid var(--border);padding:1px 5px;border-radius:3px;font-size:11px">effective_gas_price = BaseFee + min(GasPremium, GasFeeCap − BaseFee)</code>. Total cost = GasUsed × BaseFee (burned) + GasUsed × effective_premium (to SP) + overestimation burn. Today: BaseFee ≈ 100 attoFIL, SP tip dominates (99.9%). Under FIP-0115 (Draft): BaseFee rises to ~90% of EGP.</div>
       </div>
-
-      <div style="margin-top:20px">
-        <div style="font-size:13px;font-weight:600;margin-bottom:8px">Data sources</div>
-        <div style="font-size:12px;color:var(--text2);line-height:1.7">
-          Gas values: FOC Observer mainnet (live, queried on page load) · EGP history: FOC Observer <code style="font-size:11px">effective_gas_price</code> field on real FWSS transactions · FIL price: CoinGecko · Model refit: GitHub Actions daily at 09:00 UTC.
-        </div>
-      </div>
-
     </div>
   </details>
 
@@ -469,541 +441,460 @@ table.bt tfoot td { padding: 10px 14px; font-weight: 700; color: var(--text); ba
 
 <script>
 // ── Constants ─────────────────────────────────────────────────────────────────
-const MODEL_ALPHA = 158.67e6;
-const MODEL_BETA  = 8.485e6;
-const NPP_GAS     = 124e6;
-const GAS_TARGET  = 70560e9; // Ggas/day in gas units
+const MODEL_ALPHA = 158.67e6, MODEL_BETA = 8.485e6, NPP_GAS = 124e6;
+const GAS_TARGET  = 70560e9;
+const TIPSET      = 24.5e9;
 
-// REM_OBS: observed mainnet values for removePieces
 const REM_OBS = {1:407e6,2:601e6,3:781e6,4:950e6,5:1010e6,9:840e6,20:1754e6,50:5900e6,80:9530e6,125:8075e6,144:8600e6};
-const REM_EXP = 0.614;
-
-// ── FIP-0115 regime presets ──────────────────────────────────────────────────────
-// Pre FIP-0115: BaseFee ≈ 100, GasPremium ≈ 252,000, GasFeeCap ≈ 300,000
-// Post FIP-0115 (estimated): BaseFee converges upward, premium shrinks
-// The FIP targets Premium_20 / BaseFee = 1/8, so at equilibrium:
-//   if total_egp stays similar (~252,000), then BaseFee ~ 252,000 / (1 + 8) * 8 ~ 224,000
-//   and Premium ~ 28,000. This is a rough estimate — actual values depend on market.
-// Status: DRAFT (created 2026-02-13) — not yet active on mainnet.
-const FIP_REGIMES = {
-  pre: {
-    basefee: 100,
-    premium: 252105,
-    feecap:  300000,
-    note: 'Pre FIP-0115 (today): BaseFee ≈ 100 attoFIL, GasPremium dominates (99.9% of fee). BaseFee is only 0.04% of effective gas price.',
-  },
-  post: {
-    basefee: 200000,
-    premium: 28000,
-    feecap:  250000,
-    note: 'Post FIP-0115 (estimated): at equilibrium Premium₂₀ / BaseFee = 1/8. If total EGP stays ~250k, BaseFee ~ 222k and Premium ~ 28k. BaseFee becomes ~89% of the fee — burn dominates over SP tip. NOTE: FIP-0115 is still in Draft status.',
-  },
-};
-
-function setFIPRegime(key, btn) {
-  const regime = FIP_REGIMES[key];
-  document.getElementById('inp-basefee').value = regime.basefee;
-  document.getElementById('inp-premium').value = regime.premium;
-  document.getElementById('inp-feecap').value  = regime.feecap;
-  document.getElementById('fip-pre').classList.remove('active');
-  document.getElementById('fip-post').classList.remove('active');
-  if (btn) btn.classList.add('active');
-  document.getElementById('fip-note').textContent = regime.note;
-  // clear other presets
-  document.querySelectorAll('#bf-presets .preset-btn, #prem-presets .preset-btn, #fc-presets .preset-btn')
-    .forEach(b => b.classList.remove('active'));
-  onGasFeeChange();
-}
-
-// ── Gas fee model ─────────────────────────────────────────────────────────────
-// effective_gas_price = BaseFee + min(GasPremium, GasFeeCap - BaseFee)
-// From: lotus/chain/types/message.go EffectiveGasPremium()
-function effectiveGasPrice(bf, prem, fc) {
-  const effectivePremium = Math.min(prem, Math.max(0, fc - bf));
-  return bf + effectivePremium;
-}
-
-// Total tx cost in FIL = gas_used * egp / 1e18
-// (This approximates the full cost: base_burn + sp_tip + overestimation_burn)
-// The overestimation burn is typically small (<5%) and we flag it.
-function gasCostFIL(gasUsed, egp) {
-  return gasUsed * egp / 1e18;
-}
-
-// Burn component = gasUsed * baseFee / 1e18
-function burnFIL(gasUsed, bf) {
-  return gasUsed * bf / 1e18;
-}
-
-// SP tip = gasUsed * effectivePremium / 1e18 (approx, using gasUsed not gasLimit)
-function tipFIL(gasUsed, bf, prem, fc) {
-  const effPrem = Math.min(prem, Math.max(0, fc - bf));
-  return gasUsed * effPrem / 1e18;
-}
-
-// ── Gas models ────────────────────────────────────────────────────────────────
-function ppGas(pieces) {
-  return MODEL_ALPHA + MODEL_BETA * Math.log2(Math.max(1, pieces));
-}
-
 function remGas(K) {
   K = Math.max(1, Math.round(K));
-  if (REM_OBS[K] !== undefined) return REM_OBS[K];
-  if (K > 144) return 407e6 * Math.pow(K, REM_EXP);
-  const keys = Object.keys(REM_OBS).map(Number).sort((a,b) => a-b);
-  let lo = keys[0], hi = keys[keys.length-1];
-  for (let i = 0; i < keys.length-1; i++) {
-    if (keys[i] <= K && keys[i+1] >= K) { lo = keys[i]; hi = keys[i+1]; break; }
-  }
-  const t = (K - lo) / (hi - lo);
-  return REM_OBS[lo] + t * (REM_OBS[hi] - REM_OBS[lo]);
+  if (REM_OBS[K]) return REM_OBS[K];
+  if (K > 144) return 407e6 * Math.pow(K, 0.614);
+  const ks = Object.keys(REM_OBS).map(Number).sort((a,b)=>a-b);
+  let lo=ks[0],hi=ks[ks.length-1];
+  for(let i=0;i<ks.length-1;i++){if(ks[i]<=K&&ks[i+1]>=K){lo=ks[i];hi=ks[i+1];break;}}
+  return REM_OBS[lo]+(K-lo)/(hi-lo)*(REM_OBS[hi]-REM_OBS[lo]);
 }
 
-// ── State ─────────────────────────────────────────────────────────────────────
-let GAS = null; // live gas values from FOC Observer
-let filPrice = 0.92;
-let egp = 252205; // effective gas price
+const FIP_REGIMES = {
+  pre:  { bf:100,    prem:252105, fc:300000, note:'Pre FIP-0115 (today): BaseFee ≈ 100 attoFIL, SP tip dominates (99.9% of fee).' },
+  post: { bf:200000, prem:28000,  fc:250000, note:'Post FIP-0115 (estimated): BaseFee ~222k, GasPremium ~28k. BaseFee becomes ~89% of EGP. Status: Draft.' },
+};
 
-// ── Presets ───────────────────────────────────────────────────────────────────
-const PRESETS_BF   = { 'Today (~100)': 100, 'Low congestion': 500, 'Medium': 5000, 'High spike': 50000 };
-const PRESETS_PREM = { '30d avg': 252105, 'Min (100k)': 100000, 'High': 500000 };
-const PRESETS_FC   = { 'Typical': 300000, 'High': 600000 };
+const BATCH_DATA = [
+  {k:1,gas:281.5e6,src:'observed'},{k:2,gas:295e6,src:'observed'},{k:3,gas:340e6,src:'observed'},
+  {k:5,gas:469e6,src:'observed'},{k:9,gas:719e6,src:'observed'},{k:10,gas:778e6,src:'observed'},
+  {k:20,gas:null,src:'extrapolated'},{k:50,gas:null,src:'extrapolated'},{k:100,gas:null,src:'extrapolated'},
+];
 
-function setPreset(type, val, btn) {
-  if (type === 'bf') {
-    document.getElementById('inp-basefee').value = val;
-    document.querySelectorAll('#bf-presets .preset-btn').forEach(b => b.classList.remove('active'));
-  } else if (type === 'prem') {
-    document.getElementById('inp-premium').value = val;
-    document.querySelectorAll('#prem-presets .preset-btn').forEach(b => b.classList.remove('active'));
-  } else if (type === 'fc') {
-    if (val === 0) {
-      const bf = parseFloat(document.getElementById('inp-basefee').value) || 100;
-      const prem = parseFloat(document.getElementById('inp-premium').value) || 252105;
-      document.getElementById('inp-feecap').value = bf + prem;
-    } else {
-      document.getElementById('inp-feecap').value = val;
-    }
-    document.querySelectorAll('#fc-presets .preset-btn').forEach(b => b.classList.remove('active'));
-  }
-  if (btn) btn.classList.add('active');
-  onGasFeeChange();
+const PP_DATA = [[1,149.9],[2,152.5],[4,158.7],[8,164.3],[16,160.6],[32,169.7],[64,172.8],[128,172.6],[256,139.8],[512,184.8],[1024,191.1],[4096,209.4],[8192,208.2],[65536,176.1],[134217728,279.1]];
+
+let GAS = null, filPrice = 0.92, egp = 252205;
+let HIST_EGP = {};
+
+// ── Gas fee ───────────────────────────────────────────────────────────────────
+function effectiveGasPrice(bf, prem, fc) {
+  return bf + Math.min(prem, Math.max(0, fc - bf));
 }
+function burnFIL(gas, bf)       { return gas * bf / 1e18; }
+function tipFIL(gas, bf, prem, fc) { return gas * Math.min(prem, Math.max(0,fc-bf)) / 1e18; }
+function gasCostFIL(gas)        { return gas * egp / 1e18; }
 
 function onGasFeeChange() {
   const bf   = parseFloat(document.getElementById('inp-basefee').value) || 100;
   const prem = parseFloat(document.getElementById('inp-premium').value) || 252105;
-  const fc   = parseFloat(document.getElementById('inp-feecap').value) || 300000;
+  const fc   = parseFloat(document.getElementById('inp-feecap').value)  || 300000;
   egp = effectiveGasPrice(bf, prem, fc);
   document.getElementById('egp-val').textContent = egp.toLocaleString();
-  const effPrem = Math.min(prem, Math.max(0, fc - bf));
-  const cappedNote = effPrem < prem ? ' ⚠ premium capped by GasFeeCap' : '';
-  document.getElementById('egp-sub').textContent = 'attoFIL/gas' + cappedNote;
+  const effPrem = Math.min(prem, Math.max(0, fc-bf));
+  document.getElementById('egp-sub').textContent = 'attoFIL/gas' + (effPrem < prem ? ' ⚠ premium capped by GasFeeCap' : '');
   recalc();
 }
 
-// ── Formatting ────────────────────────────────────────────────────────────────
-function fmtGas(g) {
-  if (g >= 1e12) return (g/1e12).toFixed(2) + ' Tgas';
-  if (g >= 1e9)  return (g/1e9).toFixed(2) + ' Ggas';
-  if (g >= 1e6)  return (g/1e6).toFixed(0) + 'M gas';
-  return g.toLocaleString() + ' gas';
-}
-function fmtFIL(f) { return f.toFixed(6) + ' FIL'; }
-function fmtUSD(u) {
-  if (u < 0.0001) return '<$0.0001';
-  if (u < 1) return '$' + u.toFixed(4);
-  return '$' + u.toFixed(2);
-}
-
-// ── Slider sync ───────────────────────────────────────────────────────────────
-function syncSlider() {
-  const v = parseFloat(document.getElementById('sl-pieces').value);
-  const pieces = Math.round(Math.pow(2, v));
-  document.getElementById('inp-pieces').value = pieces;
-  recalc();
-}
-
-// ── Recalc ────────────────────────────────────────────────────────────────────
-function recalc() {
-  const bf    = parseFloat(document.getElementById('inp-basefee').value) || 100;
-  const prem  = parseFloat(document.getElementById('inp-premium').value) || 252105;
-  const fc    = parseFloat(document.getElementById('inp-feecap').value) || 300000;
-  egp = effectiveGasPrice(bf, prem, fc);
-
-  filPrice = parseFloat(document.getElementById('inp-fil').value) || 0.92;
-  const days   = parseInt(document.getElementById('inp-days').value) || 30;
-  const nDs    = parseInt(document.getElementById('inp-ds').value) || 1;
-  const nPcs   = parseInt(document.getElementById('inp-pieces').value) || 100;
-  const nAdd   = parseInt(document.getElementById('inp-add').value) || 0;
-  const batch  = Math.max(1, parseInt(document.getElementById('inp-batch').value) || 1);
-  const nRem   = parseInt(document.getElementById('inp-rem').value) || 0;
-
-  // Per-dataset proving gas per day
-  const ppG   = ppGas(nPcs);
-  const nppG  = NPP_GAS;
-
-  // Live gas if available
-  const ppGasUsed  = GAS?.provePossession || ppG;
-  const nppGasUsed = GAS?.nextProvingPeriod || nppG;
-  const addGasUsed = GAS?.addPieces1 || 281e6;
-  const cdn        = isCDN();
-  const createG    = cdn ? (GAS?.createDataSetCDN || 840e6) : (GAS?.createDataSet || 796e6);
-  const termGas    = cdn ? 241e6 : 136e6;
-  const termG      = GAS?.terminateService || 136e6;
-
-  // Tx counts
-  const ppTxns    = nDs * days;
-  const nppTxns   = nDs * days;
-  const addTxns   = nAdd > 0 ? Math.ceil(nAdd / batch) : 0;
-  const remTxns   = nRem > 0 ? 1 : 0;
-
-  // Gas
-  const ppTotalGas   = ppGasUsed * ppTxns;
-  const nppTotalGas  = nppGasUsed * nppTxns;
-  const // addPieces gas model:
-  // K≤10: use observed mainnet values from FOC Observer
-  // K>10: linear extrapolation 215M + 66M×K (unobserved — flagged)
-  // Note: 215M intercept calibrated so K=1 → 281M matches observed avg
-  let addBatchGas;
-  if (batch <= 10 && GAS && GAS['addPieces_' + batch]) {
-    addBatchGas = GAS['addPieces_' + batch]; // observed
-  } else {
-    addBatchGas = 215e6 + 66e6 * batch; // extrapolated (unobserved beyond ×10)
+function setPreset(type, val, btn) {
+  if (type==='bf')   document.getElementById('inp-basefee').value = val;
+  if (type==='prem') document.getElementById('inp-premium').value = val;
+  if (type==='fc') {
+    if (val===0) {
+      const bf=parseFloat(document.getElementById('inp-basefee').value)||100;
+      const pr=parseFloat(document.getElementById('inp-premium').value)||252105;
+      document.getElementById('inp-feecap').value = bf+pr;
+    } else document.getElementById('inp-feecap').value = val;
   }
-  const addTotalGas  = addBatchGas * addTxns;
-  const remTotalGas  = nRem > 0 ? remGas(nRem) * remTxns : 0;
-
-  const totalGas = ppTotalGas + nppTotalGas + addTotalGas + remTotalGas;
-
-  // Cost in FIL
-  const toFIL = g => gasCostFIL(g, egp);
-  const ppFIL    = toFIL(ppTotalGas);
-  const nppFIL   = toFIL(nppTotalGas);
-  const addFIL   = toFIL(addTotalGas);
-  const remFIL   = toFIL(remTotalGas);
-  const totalFIL = ppFIL + nppFIL + addFIL + remFIL;
-  const toUSD = f => f * filPrice;
-
-  // Update table
-  const rows = [
-    ['provePossession', ppTxns, ppGasUsed, ppTotalGas, ppFIL],
-    ['nextProvingPeriod', nppTxns, nppGasUsed, nppTotalGas, nppFIL],
-    ['addPieces (×' + batch + ')', addTxns, addBatchGas, addTotalGas, addFIL],
-    ['removePieces (×' + nRem + ')', remTxns, nRem > 0 ? remGas(nRem) : 0, remTotalGas, remFIL],
-  ];
-
-  document.getElementById('cost-tbody').innerHTML = rows.map(([op, txns, gpt, tg, fil]) => `
-    <tr>
-      <td style="font-weight:500;color:var(--text)">${op}</td>
-      <td class="tr mono">${txns.toLocaleString()}</td>
-      <td class="tr mono">${fmtGas(gpt)}</td>
-      <td class="tr mono">${fmtGas(tg)}</td>
-      <td class="tr mono">${fmtFIL(fil)}</td>
-      <td class="tr mono">${fmtUSD(toUSD(fil))}</td>
-    </tr>`).join('');
-
-  document.getElementById('tot-gas').textContent = fmtGas(totalGas);
-  document.getElementById('tot-fil').textContent = fmtFIL(totalFIL);
-  document.getElementById('tot-usd').textContent = fmtUSD(toUSD(totalFIL));
-  document.getElementById('breakdown-sub').textContent = days + ' days · ' + nDs + ' datasets · EGP ' + egp.toLocaleString() + ' attoFIL/gas';
-
-  // ── Cost detail per operation ─────────────────────────────────────────────
-  const detailOps = [
-    { op: 'provePossession (per tx)', gas: ppGasUsed },
-    { op: 'nextProvingPeriod (per tx)', gas: nppGasUsed },
-    { op: 'addPieces ×' + batch + ' (per tx)', gas: addBatchGas },
-  ];
-  if (nRem > 0) detailOps.push({ op: 'removePieces ×' + nRem + ' (per tx)', gas: remGas(nRem) });
-
-  document.getElementById('cost-detail-grid').innerHTML = detailOps.map(({ op, gas }) => {
-    const burnF = burnFIL(gas, bf);
-    const tipF  = tipFIL(gas, bf, prem, fc);
-    const totF  = burnF + tipF;
-    return `<div class="cdc">
-      <div class="cdc-op">${op}</div>
-      <div class="cdc-row"><span class="cdc-key">Gas used</span><span class="cdc-val">${fmtGas(gas)}</span></div>
-      <div class="cdc-row"><span class="cdc-key">Burned (BaseFee × GasUsed)</span><span class="cdc-val burn">${fmtFIL(burnF)}</span></div>
-      <div class="cdc-row"><span class="cdc-key">SP tip (effective_premium × GasUsed)</span><span class="cdc-val tip">${fmtFIL(tipF)}</span></div>
-      <div class="cdc-row"><span class="cdc-key">Total</span><span class="cdc-val total">${fmtFIL(totF)} · ${fmtUSD(totF * filPrice)}</span></div>
-    </div>`;
-  }).join('');
-
-  // ── Summary ───────────────────────────────────────────────────────────────
-  const dailyGas = (ppGasUsed + nppGasUsed) * nDs;
-  const dailyPct = (dailyGas / GAS_TARGET * 100).toFixed(4);
-  const dailyFIL = toFIL(dailyGas);
-  const perDsMonth = toFIL((ppGasUsed + nppGasUsed) * 30);
-  const perPieceFIL = nAdd > 0 ? toFIL(addBatchGas) / batch : 0;
-
-  document.getElementById('sum-daily-gas').textContent = fmtGas(dailyGas);
-  document.getElementById('sum-daily-pct').textContent = dailyPct + '% of daily gas target';
-  document.getElementById('sum-daily-fil').textContent = fmtFIL(dailyFIL);
-  document.getElementById('sum-daily-usd').textContent = fmtUSD(toUSD(dailyFIL)) + '/day';
-  document.getElementById('sum-per-ds').textContent = fmtUSD(toUSD(perDsMonth));
-  document.getElementById('sum-per-piece').textContent = nAdd > 0 ? fmtFIL(perPieceFIL) : '—';
-  document.getElementById('sum-per-piece-sub').textContent = nAdd > 0 ? fmtUSD(toUSD(perPieceFIL)) + '/piece · batch ×' + batch : 'no uploads';
+  document.querySelectorAll('#'+type+'-presets .preset-btn').forEach(b=>b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  onGasFeeChange();
 }
 
-// ── Load live gas from FOC Observer ──────────────────────────────────────────
-async function loadGasData() {
-  const r = await fetch('https://foc-observer.va.gg/sql', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      sql: `
-        SELECT op, ROUND(AVG(gas_used)) as avg_gas, ROUND(AVG(effective_gas_price)) as avg_egp
-        FROM (
-          SELECT 'provePossession' as op, gas_used, effective_gas_price FROM pdp_possession_proven WHERE timestamp >= EXTRACT(EPOCH FROM NOW())-86400*30
-          UNION ALL SELECT 'nextProvingPeriod', gas_used, effective_gas_price FROM pdp_next_proving_period WHERE timestamp >= EXTRACT(EPOCH FROM NOW())-86400*30
-          UNION ALL SELECT 'addPieces_1', gas_used, effective_gas_price FROM pdp_pieces_added WHERE piece_count=1 AND timestamp >= EXTRACT(EPOCH FROM NOW())-86400*30
-          UNION ALL SELECT 'addPieces_2', gas_used, effective_gas_price FROM pdp_pieces_added WHERE piece_count=2 AND timestamp >= EXTRACT(EPOCH FROM NOW())-86400*30
-          UNION ALL SELECT 'addPieces_5', gas_used, effective_gas_price FROM pdp_pieces_added WHERE piece_count=5 AND timestamp >= EXTRACT(EPOCH FROM NOW())-86400*30
-          UNION ALL SELECT 'addPieces_10', gas_used, effective_gas_price FROM pdp_pieces_added WHERE piece_count=10 AND timestamp >= EXTRACT(EPOCH FROM NOW())-86400*30
-          UNION ALL SELECT 'createDataSet', gas_used, effective_gas_price FROM fwss_data_set_created WHERE timestamp >= EXTRACT(EPOCH FROM NOW())-86400*30
-          UNION ALL SELECT 'terminateService', gas_used, effective_gas_price FROM fwss_service_terminated WHERE timestamp >= EXTRACT(EPOCH FROM NOW())-86400*30
-          UNION ALL SELECT 'removePieces_1', gas_used, effective_gas_price FROM pdp_pieces_removed WHERE piece_count=1 AND timestamp >= EXTRACT(EPOCH FROM NOW())-86400*30
-        ) t GROUP BY op`,
-      network: 'mainnet'
-    })
-  });
-  const d = await r.json();
-  GAS = {};
-  d.rows.forEach(row => { GAS[row.op] = parseFloat(row.avg_gas); });
-  GAS.addPieces1 = GAS.addPieces_1 || 281e6;
-  GAS.provePossession = GAS.provePossession || 190e6;
-  GAS.nextProvingPeriod = GAS.nextProvingPeriod || 124e6;
-
-  // Render gas ref grid
-  const ops = [
-    { label: 'provePossession', key: 'provePossession', note: 'per proof' },
-    { label: 'nextProvingPeriod', key: 'nextProvingPeriod', note: 'per period' },
-    { label: 'addPieces ×1', key: 'addPieces_1', note: 'per tx' },
-    { label: 'addPieces ×10', key: 'addPieces_10', note: 'per tx' },
-    { label: 'createDataSet', key: 'createDataSet', note: 'per dataset' },
-    { label: 'terminateService', key: 'terminateService', note: 'per dataset' },
-    { label: 'removePieces ×1', key: 'removePieces_1', note: 'per tx' },
-  ];
-  document.getElementById('gas-ref-grid').innerHTML = ops.map(({ label, key, note }) => {
-    const gas = GAS[key] || 0;
-    const fil = gasCostFIL(gas, egp);
-    const usd = fil * filPrice;
-    return `<div class="gas-ref-card">
-      <div class="grc-label">${label}</div>
-      <div class="grc-gas">${fmtGas(gas)}</div>
-      <div class="grc-fil">${fmtFIL(fil)}</div>
-      <div class="grc-usd">${fmtUSD(usd)} · ${note}</div>
-    </div>`;
-  }).join('');
+function setFIPRegime(key, btn) {
+  const r = FIP_REGIMES[key];
+  document.getElementById('inp-basefee').value = r.bf;
+  document.getElementById('inp-premium').value = r.prem;
+  document.getElementById('inp-feecap').value  = r.fc;
+  ['bf','prem','fc'].forEach(t => document.querySelectorAll('#'+t+'-presets .preset-btn').forEach(b=>b.classList.remove('active')));
+  document.getElementById('fip-pre').classList.toggle('active', key==='pre');
+  document.getElementById('fip-post').classList.toggle('active', key==='post');
+  document.getElementById('fip-note').textContent = r.note;
+  if (btn) btn.classList.add('active');
+  onGasFeeChange();
 }
 
-// ── Load FIL price ────────────────────────────────────────────────────────────
-async function loadFILPrice() {
-  try {
-    const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=filecoin&vs_currencies=usd');
-    const d = await r.json();
-    filPrice = d?.filecoin?.usd || 0.92;
-    document.getElementById('inp-fil').value = filPrice.toFixed(3);
-  } catch(e) {}
+// ── Format ────────────────────────────────────────────────────────────────────
+function fmtGas(g) {
+  if (g>=1e12) return (g/1e12).toFixed(2)+' Tgas';
+  if (g>=1e9)  return (g/1e9).toFixed(2)+' Ggas';
+  return (g/1e6).toFixed(0)+'M gas';
+}
+function fmtFIL(f) { return f.toFixed(6)+' FIL'; }
+function fmtUSD(u) {
+  if (u<0.0001) return '<$0.0001';
+  if (u<1) return '$'+u.toFixed(4);
+  return '$'+u.toFixed(2);
 }
 
-// ── Historical EGP ───────────────────────────────────────────────────────────
-let HIST_EGP = {};
+// ── Sliders ───────────────────────────────────────────────────────────────────
+function syncFromSlider() {
+  const v = parseFloat(document.getElementById('sl-pieces').value);
+  document.getElementById('inp-pieces').value = Math.round(Math.pow(2,v));
+  recalc();
+}
+function syncFromInput() {
+  const v = parseInt(document.getElementById('inp-pieces').value)||1;
+  document.getElementById('sl-pieces').value = Math.min(20, Math.log2(Math.max(1,v)));
+}
+function checkBatch() {
+  const b = parseInt(document.getElementById('inp-batch').value)||1;
+  const w = document.getElementById('batch-warn');
+  if (w) w.className = 'warn-box' + (b>10?' show':'');
+}
 
+// ── Historical EGP ────────────────────────────────────────────────────────────
 async function loadHistEGP() {
   const r = await fetch('https://foc-observer.va.gg/sql', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    method:'POST', headers:{'Content-Type':'application/json'},
     body: JSON.stringify({
-      sql: `SELECT
-        ROUND(AVG(CASE WHEN timestamp >= EXTRACT(EPOCH FROM NOW())-86400 THEN effective_gas_price END)) as h24,
-        ROUND(AVG(CASE WHEN timestamp >= EXTRACT(EPOCH FROM NOW())-86400*30 THEN effective_gas_price END)) as h30d,
-        ROUND(AVG(CASE WHEN timestamp >= EXTRACT(EPOCH FROM NOW())-86400*90 THEN effective_gas_price END)) as h90d,
-        ROUND(MIN(effective_gas_price)) as hmin,
-        ROUND(MAX(effective_gas_price)) as hmax
+      sql:`SELECT
+        ROUND(AVG(CASE WHEN timestamp>=EXTRACT(EPOCH FROM NOW())-86400 THEN effective_gas_price END)) as h24,
+        ROUND(AVG(CASE WHEN timestamp>=EXTRACT(EPOCH FROM NOW())-86400*30 THEN effective_gas_price END)) as h30,
+        ROUND(AVG(CASE WHEN timestamp>=EXTRACT(EPOCH FROM NOW())-86400*90 THEN effective_gas_price END)) as h90,
+        ROUND(MIN(effective_gas_price)) as hmin, ROUND(MAX(effective_gas_price)) as hmax
         FROM pdp_possession_proven`,
-      network: 'mainnet'
+      network:'mainnet'
     })
   });
   const d = await r.json();
   const row = d.rows[0];
-  HIST_EGP = { h24: parseFloat(row.h24), h30d: parseFloat(row.h30d), h90d: parseFloat(row.h90d), hmin: parseFloat(row.hmin), hmax: parseFloat(row.hmax) };
-  document.getElementById('egp-24h').textContent = HIST_EGP.h24.toLocaleString();
-  document.getElementById('egp-30d').textContent = HIST_EGP.h30d.toLocaleString();
-  document.getElementById('egp-90d').textContent = HIST_EGP.h90d.toLocaleString();
-  document.getElementById('egp-min').textContent = HIST_EGP.hmin.toLocaleString();
-  document.getElementById('egp-max').textContent = HIST_EGP.hmax.toLocaleString();
+  HIST_EGP = {h24:parseFloat(row.h24),h30:parseFloat(row.h30),h90:parseFloat(row.h90),hmin:parseFloat(row.hmin),hmax:parseFloat(row.hmax)};
+  ['h24','h30','h90','hmin','hmax'].forEach((k,i) => {
+    const ids = ['egp-24h','egp-30d','egp-90d','egp-min','egp-max'];
+    document.getElementById(ids[i]).textContent = HIST_EGP[k].toLocaleString();
+  });
 }
 
 function applyHistEGP(period) {
-  const val = period === '24h' ? HIST_EGP.h24 : HIST_EGP.h30d;
+  const val = period==='24h' ? HIST_EGP.h24 : HIST_EGP.h30;
   if (!val) return;
-  // Decompose: set basefee=100, feecap=val+100, premium=val-100
   document.getElementById('inp-basefee').value = 100;
-  document.getElementById('inp-premium').value = Math.round(val - 100);
-  document.getElementById('inp-feecap').value  = Math.round(val + 1000);
-  document.querySelectorAll('#bf-presets .preset-btn, #prem-presets .preset-btn, #fc-presets .preset-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('fip-pre').classList.add('active');
-  document.getElementById('fip-post').classList.remove('active');
-  document.getElementById('fip-note').textContent = 'Using ' + period + ' average effective gas price from real FWSS transactions';
+  document.getElementById('inp-premium').value = Math.round(val-100);
+  document.getElementById('inp-feecap').value  = Math.round(val+1000);
+  ['bf','prem','fc'].forEach(t=>document.querySelectorAll('#'+t+'-presets .preset-btn').forEach(b=>b.classList.remove('active')));
+  document.getElementById('fip-note').textContent = 'Using '+period+' avg EGP from real FWSS transactions';
   onGasFeeChange();
 }
 
 // ── Batching table ────────────────────────────────────────────────────────────
-const BATCH_DATA = [
-  { k: 1,   gas: 281.5e6, src: 'observed' },
-  { k: 2,   gas: 295.0e6, src: 'observed' },
-  { k: 3,   gas: 340.0e6, src: 'observed' },
-  { k: 5,   gas: 469.0e6, src: 'observed' },
-  { k: 9,   gas: 719.0e6, src: 'observed' },
-  { k: 10,  gas: 778.0e6, src: 'observed' },
-  { k: 20,  gas: null,    src: 'extrapolated' },
-  { k: 100, gas: null,    src: 'extrapolated' },
-];
-
 function renderBatchTable() {
   const base1 = 281.5e6;
-  const rows = BATCH_DATA.map(({ k, gas, src }) => {
-    const g = gas !== null ? gas : 215e6 + 66e6 * k;
-    const gpp = g / k;
-    const saving = ((base1 - gpp) / base1 * 100).toFixed(0);
-    const color = src === 'extrapolated' ? 'color:var(--text3)' : '';
-    return `<tr style="${color}">
-      <td style="padding:7px 12px;border-bottom:1px solid var(--border);font-weight:500">×${k}</td>
-      <td style="padding:7px 12px;border-bottom:1px solid var(--border);text-align:right;font-family:var(--mono);font-size:12px">${fmtGas(g)}</td>
-      <td style="padding:7px 12px;border-bottom:1px solid var(--border);text-align:right;font-family:var(--mono);font-size:12px">${fmtGas(gpp)}</td>
-      <td style="padding:7px 12px;border-bottom:1px solid var(--border);text-align:right;font-family:var(--mono);font-size:12px;color:var(--green)">${k > 1 ? saving + '%' : '—'}</td>
-      <td style="padding:7px 12px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text3)">${src}</td>
-    </tr>`;
+  document.getElementById('batch-tbody').innerHTML = BATCH_DATA.map(({k,gas,src}) => {
+    const g = gas!==null ? gas : 215e6+66e6*k;
+    const gpp = g/k;
+    const saving = k>1 ? ((base1-gpp)/base1*100).toFixed(0)+'%' : '—';
+    const dim = src==='extrapolated' ? 'color:var(--text3)' : '';
+    return `<tr style="${dim}"><td style="font-weight:500">×${k}</td>
+      <td class="tr mono">${fmtGas(g)}</td><td class="tr mono">${fmtGas(gpp)}</td>
+      <td class="tr" style="color:var(--green)">${saving}</td>
+      <td style="font-size:11px;color:var(--text3)">${src}</td></tr>`;
   }).join('');
-  const el = document.getElementById('batch-tbody');
-  if (el) el.innerHTML = rows;
 }
 
-// ── PP model chart — real mainnet data ───────────────────────────────────────
-// Binned averages from 870 real mainnet datasets (FOC Observer, April 2026)
-const PP_DATA = [[1,149.9],[2,152.5],[4,158.7],[8,164.3],[16,160.6],[32,169.7],[64,172.8],[128,172.6],[256,139.8],[512,184.8],[1024,191.1],[4096,209.4],[8192,208.2],[65536,176.1],[134217728,279.1]];
-
+// ── PP chart ──────────────────────────────────────────────────────────────────
 function drawPPChart() {
   const canvas = document.getElementById('pp-chart');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
-  const PAD = { l: 55, r: 20, t: 30, b: 44 };
-
-  const xMin = 0, xMax = 27.1; // log2(139M) ≈ 27.1
-  const yMin = 120, yMax = 300;
-
-  const toX = v => PAD.l + Math.log2(Math.max(1,v)) / xMax * (W - PAD.l - PAD.r);
-  const toY = v => H - PAD.b - (v - yMin) / (yMax - yMin) * (H - PAD.t - PAD.b);
-
-  ctx.clearRect(0, 0, W, H);
-
-  // Grid lines
-  ctx.strokeStyle = '#e8eaef'; ctx.lineWidth = 1;
-  [120,140,160,180,200,220,240,260,280,300].forEach(y => {
-    ctx.beginPath(); ctx.moveTo(PAD.l, toY(y)); ctx.lineTo(W-PAD.r, toY(y)); ctx.stroke();
-    ctx.fillStyle = '#9198b0'; ctx.font = '10px Inter'; ctx.textAlign = 'right';
-    ctx.fillText(y + 'M', PAD.l-4, toY(y)+4);
+  const W=canvas.width, H=canvas.height;
+  const PAD={l:55,r:20,t:30,b:44};
+  const xMax=27.1, yMin=120, yMax=300;
+  const toX = v => PAD.l + Math.log2(Math.max(1,v))/xMax*(W-PAD.l-PAD.r);
+  const toY = v => H-PAD.b-(v-yMin)/(yMax-yMin)*(H-PAD.t-PAD.b);
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle='#e8eaef'; ctx.lineWidth=1;
+  [120,140,160,180,200,220,240,260,280,300].forEach(y=>{
+    ctx.beginPath(); ctx.moveTo(PAD.l,toY(y)); ctx.lineTo(W-PAD.r,toY(y)); ctx.stroke();
+    ctx.fillStyle='#9198b0'; ctx.font='10px Inter'; ctx.textAlign='right';
+    ctx.fillText(y+'M', PAD.l-4, toY(y)+4);
   });
-  [1,4,16,64,256,1024,4096,65536,1048576,16777216,134217728].forEach(x => {
-    const px = toX(x);
-    ctx.beginPath(); ctx.moveTo(px, PAD.t); ctx.lineTo(px, H-PAD.b); ctx.stroke();
-    ctx.fillStyle = '#9198b0'; ctx.font = '9px Inter'; ctx.textAlign = 'center';
-    const lbl = x >= 1e6 ? (x/1e6).toFixed(0)+'M' : x >= 1000 ? (x/1000)+'k' : x+'';
-    ctx.fillText(lbl, px, H-PAD.b+13);
+  [1,4,16,64,256,1024,4096,65536,1048576,16777216,134217728].forEach(x=>{
+    const px=toX(x);
+    ctx.beginPath(); ctx.moveTo(px,PAD.t); ctx.lineTo(px,H-PAD.b); ctx.stroke();
+    ctx.fillStyle='#9198b0'; ctx.font='9px Inter'; ctx.textAlign='center';
+    const lbl=x>=1e6?(x/1e6).toFixed(0)+'M':x>=1000?(x/1000)+'k':x+'';
+    ctx.fillText(lbl,px,H-PAD.b+13);
   });
-
-  // MAE band (±4.8M from model)
-  ctx.fillStyle = 'rgba(59,111,245,0.07)';
-  ctx.beginPath();
-  let first = true;
-  for (let x = 1; x <= 200000000; x *= 1.15) {
-    const y = 158.67 + 8.485 * Math.log2(x) + 14.4; // ±3×MAE
-    first ? ctx.moveTo(toX(x), toY(y)) : ctx.lineTo(toX(x), toY(y));
-    first = false;
-  }
-  for (let x = 200000000; x >= 1; x /= 1.15) {
-    const y = 158.67 + 8.485 * Math.log2(x) - 14.4;
-    ctx.lineTo(toX(x), toY(y));
-  }
+  // band
+  ctx.fillStyle='rgba(59,111,245,0.07)';
+  ctx.beginPath(); let first=true;
+  for(let x=1;x<=2e8;x*=1.15){ const y=158.67+8.485*Math.log2(x)+14.4; first?ctx.moveTo(toX(x),toY(y)):ctx.lineTo(toX(x),toY(y)); first=false; }
+  for(let x=2e8;x>=1;x/=1.15){ ctx.lineTo(toX(x),toY(158.67+8.485*Math.log2(x)-14.4)); }
   ctx.closePath(); ctx.fill();
-
-  // Model line
-  ctx.strokeStyle = '#3b6ff5'; ctx.lineWidth = 2;
-  ctx.beginPath();
-  first = true;
-  for (let x = 1; x <= 200000000; x *= 1.05) {
-    const y = 158.67 + 8.485 * Math.log2(x);
-    first ? ctx.moveTo(toX(x), toY(y)) : ctx.lineTo(toX(x), toY(y));
-    first = false;
-  }
+  // model line
+  ctx.strokeStyle='#3b6ff5'; ctx.lineWidth=2; ctx.beginPath(); first=true;
+  for(let x=1;x<=2e8;x*=1.05){ const y=158.67+8.485*Math.log2(x); first?ctx.moveTo(toX(x),toY(y)):ctx.lineTo(toX(x),toY(y)); first=false; }
   ctx.stroke();
-
-  // Real data points (binned averages)
-  PP_DATA.forEach(([x, y]) => {
-    ctx.fillStyle = '#1a1d2e';
-    ctx.beginPath();
-    ctx.arc(toX(x), toY(y), 4, 0, Math.PI*2);
-    ctx.fill();
-    // Error bar: show model vs data difference
-    const model_y = 158.67 + 8.485 * Math.log2(Math.max(1,x));
-    const diff = Math.abs(y - model_y);
-    if (diff > 10) { // flag big outliers
-      ctx.strokeStyle = y > model_y ? '#dc2626' : '#ea580c';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(toX(x), toY(y));
-      ctx.lineTo(toX(x), toY(model_y));
-      ctx.stroke();
-    }
+  // data points
+  PP_DATA.forEach(([x,y])=>{
+    ctx.fillStyle='#1a1d2e'; ctx.beginPath(); ctx.arc(toX(x),toY(y),4,0,Math.PI*2); ctx.fill();
+    const my=158.67+8.485*Math.log2(Math.max(1,x));
+    if(Math.abs(y-my)>10){ ctx.strokeStyle='#ea580c'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(toX(x),toY(y)); ctx.lineTo(toX(x),toY(my)); ctx.stroke(); }
   });
-
-  // Axis labels
-  ctx.fillStyle = '#5a6075'; ctx.font = '11px Inter'; ctx.textAlign = 'center';
-  ctx.fillText('Pieces per dataset (log₂ scale)', W/2, H-2);
-  ctx.save(); ctx.translate(12, H/2); ctx.rotate(-Math.PI/2);
-  ctx.fillText('Avg gas (M)', 0, 0); ctx.restore();
-
-  // Legend
-  ctx.font = '11px Inter'; ctx.textAlign = 'left';
-  ctx.fillStyle = '#3b6ff5';
+  ctx.fillStyle='#5a6075'; ctx.font='11px Inter'; ctx.textAlign='center';
+  ctx.fillText('Pieces per dataset (log₂ scale)',W/2,H-2);
+  ctx.save(); ctx.translate(12,H/2); ctx.rotate(-Math.PI/2); ctx.fillText('Gas (M)',0,0); ctx.restore();
+  // legend
+  ctx.textAlign='left'; ctx.font='11px Inter'; ctx.fillStyle='#3b6ff5';
   ctx.fillText('— model: 158.67M + 8.485M×log₂(N)', PAD.l+6, PAD.t+14);
-  ctx.fillStyle = 'rgba(59,111,245,0.35)';
-  ctx.fillRect(PAD.l+6, PAD.t+21, 28, 6);
-  ctx.fillStyle = '#9198b0';
-  ctx.fillText('±3×MAE band', PAD.l+40, PAD.t+28);
-  ctx.fillStyle = '#1a1d2e';
-  ctx.beginPath(); ctx.arc(PAD.l+12, PAD.t+38, 4, 0, Math.PI*2); ctx.fill();
-  ctx.fillStyle = '#9198b0';
-  ctx.fillText('binned avg (real mainnet data)', PAD.l+22, PAD.t+42);
+  ctx.fillStyle='rgba(59,111,245,0.35)'; ctx.fillRect(PAD.l+6,PAD.t+21,28,6);
+  ctx.fillStyle='#9198b0'; ctx.fillText('±3×MAE band', PAD.l+40, PAD.t+28);
+  ctx.fillStyle='#1a1d2e'; ctx.beginPath(); ctx.arc(PAD.l+12,PAD.t+38,4,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#9198b0'; ctx.fillText('real mainnet data (binned avg)', PAD.l+22, PAD.t+42);
 }
 
-// ── CDN gas adjustment ────────────────────────────────────────────────────────
-function isCDN() { return document.getElementById('cdn-toggle')?.checked || false; }
+// ── USD cost bar chart ────────────────────────────────────────────────────────
+function drawCostChart(labels, values) {
+  const canvas = document.getElementById('cost-chart');
+  if (!canvas) return;
+  canvas.width = canvas.offsetWidth * window.devicePixelRatio || 800;
+  const ctx = canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height*window.devicePixelRatio||110;
+  canvas.height = H;
+  ctx.scale(window.devicePixelRatio||1, window.devicePixelRatio||1);
+  const cW = canvas.offsetWidth, cH = canvas.offsetHeight;
+  const PAD={l:10,r:10,t:10,b:30};
+  const max=Math.max(...values,0.0001);
+  const cols=['#3b6ff5','#16a34a','#ea580c','#d97706','#7c3aed'];
+  const bw=(cW-PAD.l-PAD.r)/labels.length - 8;
+  ctx.clearRect(0,0,cW,cH);
+  labels.forEach((lbl,i)=>{
+    const x=PAD.l+i*(bw+8);
+    const h=Math.max(2,(values[i]/max)*(cH-PAD.t-PAD.b));
+    const y=cH-PAD.b-h;
+    ctx.fillStyle=cols[i%cols.length];
+    ctx.beginPath();
+    ctx.roundRect(x,y,bw,h,3);
+    ctx.fill();
+    ctx.fillStyle='#5a6075'; ctx.font='10px Inter'; ctx.textAlign='center';
+    ctx.fillText(lbl,x+bw/2,cH-PAD.b+12);
+    if(values[i]>0){
+      ctx.fillStyle='#1a1d2e'; ctx.font='10px JetBrains Mono';
+      ctx.fillText('$'+values[i].toFixed(values[i]<1?4:2),x+bw/2,y-3);
+    }
+  });
+}
 
-function checkBatch() {
-  const batch = parseInt(document.getElementById('inp-batch').value) || 1;
-  const warn = document.getElementById('batch-warn');
-  if (warn) warn.style.display = batch > 10 ? 'block' : 'none';
+// ── Load gas data ─────────────────────────────────────────────────────────────
+async function loadGasData() {
+  const r = await fetch('https://foc-observer.va.gg/sql', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      sql:`SELECT op, ROUND(AVG(gas_used)) as avg_gas, COUNT(*) as n
+        FROM (
+          SELECT 'provePossession' as op, gas_used FROM pdp_possession_proven WHERE timestamp>=EXTRACT(EPOCH FROM NOW())-86400*30
+          UNION ALL SELECT 'nextProvingPeriod', gas_used FROM pdp_next_proving_period WHERE timestamp>=EXTRACT(EPOCH FROM NOW())-86400*30
+          UNION ALL SELECT 'addPieces_1', gas_used FROM pdp_pieces_added WHERE piece_count=1 AND timestamp>=EXTRACT(EPOCH FROM NOW())-86400*30
+          UNION ALL SELECT 'addPieces_2', gas_used FROM pdp_pieces_added WHERE piece_count=2 AND timestamp>=EXTRACT(EPOCH FROM NOW())-86400*30
+          UNION ALL SELECT 'addPieces_3', gas_used FROM pdp_pieces_added WHERE piece_count=3 AND timestamp>=EXTRACT(EPOCH FROM NOW())-86400*30
+          UNION ALL SELECT 'addPieces_5', gas_used FROM pdp_pieces_added WHERE piece_count=5 AND timestamp>=EXTRACT(EPOCH FROM NOW())-86400*30
+          UNION ALL SELECT 'addPieces_9', gas_used FROM pdp_pieces_added WHERE piece_count=9 AND timestamp>=EXTRACT(EPOCH FROM NOW())-86400*30
+          UNION ALL SELECT 'addPieces_10', gas_used FROM pdp_pieces_added WHERE piece_count=10 AND timestamp>=EXTRACT(EPOCH FROM NOW())-86400*30
+          UNION ALL SELECT 'createDataSet', gas_used FROM fwss_data_set_created WHERE timestamp>=EXTRACT(EPOCH FROM NOW())-86400*30
+          UNION ALL SELECT 'terminateService', gas_used FROM fwss_service_terminated WHERE timestamp>=EXTRACT(EPOCH FROM NOW())-86400*30
+          UNION ALL SELECT 'removePieces_1', gas_used FROM pdp_pieces_removed WHERE piece_count=1 AND timestamp>=EXTRACT(EPOCH FROM NOW())-86400*30
+        ) t GROUP BY op`,
+      network:'mainnet'
+    })
+  });
+  const d = await r.json();
+  GAS = {};
+  d.rows.forEach(row => { GAS[row.op] = parseFloat(row.avg_gas); GAS[row.op+'_n'] = parseInt(row.n); });
+
+  // Gas ref grid
+  const cdn = document.getElementById('cdn-toggle')?.checked;
+  const ops = [
+    {label:'provePossession',key:'provePossession',note:'per proof'},
+    {label:'nextProvingPeriod',key:'nextProvingPeriod',note:'per period'},
+    {label:'addPieces ×1',key:'addPieces_1',note:'per tx'},
+    {label:'addPieces ×10',key:'addPieces_10',note:'per tx'},
+    {label:'createDataSet',key:'createDataSet',note:cdn?'CDN':'no CDN'},
+    {label:'terminateService',key:'terminateService',note:cdn?'CDN':'no CDN'},
+    {label:'removePieces ×1',key:'removePieces_1',note:'per tx'},
+  ];
+  document.getElementById('gas-ref-grid').innerHTML = ops.map(({label,key,note})=>{
+    let gas = GAS[key] || 0;
+    if (key==='createDataSet' && cdn) gas += 45e6;
+    if (key==='terminateService' && cdn) gas += 105e6;
+    const fil = gasCostFIL(gas);
+    return `<div class="gas-ref-card">
+      <div class="grc-label">${label}</div>
+      <div class="grc-gas">${fmtGas(gas)}</div>
+      <div class="grc-fil">${fmtFIL(fil)}</div>
+      <div class="grc-usd">${fmtUSD(fil*filPrice)} · ${note}</div>
+    </div>`;
+  }).join('');
+
+  // Full reference table
+  const refOps = [
+    {op:'provePossession',     gas:GAS.provePossession||190e6,  who:'SP',     when:'Daily (once per dataset)'},
+    {op:'nextProvingPeriod',   gas:GAS.nextProvingPeriod||124e6,who:'SP',     when:'Daily (once per dataset)'},
+    {op:'addPieces ×1',        gas:GAS.addPieces_1||281e6,      who:'Client', when:'Per upload batch'},
+    {op:'addPieces ×2',        gas:GAS.addPieces_2||295e6,      who:'Client', when:'Per upload batch'},
+    {op:'addPieces ×5',        gas:GAS.addPieces_5||469e6,      who:'Client', when:'Per upload batch'},
+    {op:'addPieces ×10',       gas:GAS.addPieces_10||778e6,     who:'Client', when:'Per upload batch'},
+    {op:'removePieces ×1',     gas:GAS.removePieces_1||407e6,   who:'Client', when:'Per removal batch'},
+    {op:'createDataSet (no CDN)', gas:GAS.createDataSet||796e6, who:'Client', when:'Once per dataset'},
+    {op:'createDataSet (CDN)', gas:(GAS.createDataSet||796e6)+45e6,'who':'Client',when:'Once per dataset'},
+    {op:'terminateService (no CDN)',gas:GAS.terminateService||136e6,'who':'Client',when:'Once per dataset'},
+    {op:'terminateService (CDN)', gas:(GAS.terminateService||136e6)+105e6,'who':'Client',when:'Once per dataset'},
+  ];
+  document.getElementById('ref-tbody').innerHTML = refOps.map(({op,gas,who,when})=>{
+    const fil=gasCostFIL(gas);
+    const whoClass = who==='SP'?'tag-sp':'tag-client';
+    return `<tr>
+      <td style="font-weight:500;color:var(--text)">${op}</td>
+      <td class="tr mono">${fmtGas(gas)}</td>
+      <td class="tr mono">${fmtFIL(fil)}</td>
+      <td class="tr mono">${fmtUSD(fil*filPrice)}</td>
+      <td><span class="tag ${whoClass}">${who}</span></td>
+      <td style="color:var(--text3)">${when}</td>
+    </tr>`;
+  }).join('');
+}
+
+async function loadFILPrice() {
+  try {
+    const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=filecoin&vs_currencies=usd');
+    filPrice = (await r.json())?.filecoin?.usd || 0.92;
+    document.getElementById('inp-fil').value = filPrice.toFixed(3);
+  } catch(e) {}
+}
+
+function isCDN() { return document.getElementById('cdn-toggle')?.checked||false; }
+
+// ── Recalc ────────────────────────────────────────────────────────────────────
+function recalc() {
+  const bf    = parseFloat(document.getElementById('inp-basefee').value)||100;
+  const prem  = parseFloat(document.getElementById('inp-premium').value)||252105;
+  const fc    = parseFloat(document.getElementById('inp-feecap').value)||300000;
+  egp = effectiveGasPrice(bf, prem, fc);
+  filPrice = parseFloat(document.getElementById('inp-fil').value)||0.92;
+  const days   = parseInt(document.getElementById('inp-days').value)||30;
+  const nDs    = parseInt(document.getElementById('inp-ds').value)||1;
+  const nPcs   = parseInt(document.getElementById('inp-pieces').value)||100;
+  const nAdd   = parseInt(document.getElementById('inp-add').value)||0;
+  const batch  = Math.max(1,parseInt(document.getElementById('inp-batch').value)||1);
+  const nRem   = parseInt(document.getElementById('inp-rem').value)||0;
+  const cdn    = isCDN();
+
+  // sync second period input
+  document.getElementById('inp-days2').value = days;
+
+  const ppG    = MODEL_ALPHA + MODEL_BETA * Math.log2(Math.max(1,nPcs));
+  const ppGas  = GAS?.provePossession || ppG;
+  const nppGas = GAS?.nextProvingPeriod || NPP_GAS;
+
+  let addBatchGas;
+  if (batch<=10 && GAS && GAS['addPieces_'+batch]) addBatchGas = GAS['addPieces_'+batch];
+  else addBatchGas = 215e6 + 66e6 * batch;
+
+  let createG = (GAS?.createDataSet || 796e6) + (cdn?45e6:0);
+  let termG   = (GAS?.terminateService || 136e6) + (cdn?105e6:0);
+
+  const ppTxns   = nDs * days;
+  const nppTxns  = nDs * days;
+  const addTxns  = nAdd>0 ? Math.ceil(nAdd/batch) : 0;
+  const remTxns  = nRem>0 ? 1 : 0;
+
+  const ppTotG   = ppGas   * ppTxns;
+  const nppTotG  = nppGas  * nppTxns;
+  const addTotG  = addBatchGas * addTxns;
+  const remTotG  = nRem>0 ? remGas(nRem)*remTxns : 0;
+  const totG     = ppTotG+nppTotG+addTotG+remTotG;
+
+  const toFIL = g => g*egp/1e18;
+  const ppFIL=toFIL(ppTotG), nppFIL=toFIL(nppTotG), addFIL=toFIL(addTotG), remFIL=toFIL(remTotG);
+  const totFIL=ppFIL+nppFIL+addFIL+remFIL;
+  const toUSD = f => f*filPrice;
+
+  // Cost breakdown table
+  const rows=[
+    ['provePossession',ppTxns,ppGas,ppTotG,ppFIL],
+    ['nextProvingPeriod',nppTxns,nppGas,nppTotG,nppFIL],
+    ['addPieces (×'+batch+')',addTxns,addBatchGas,addTotG,addFIL],
+    ['removePieces (×'+nRem+')',remTxns,nRem>0?remGas(nRem):0,remTotG,remFIL],
+  ];
+  document.getElementById('cost-tbody').innerHTML = rows.map(([op,txns,gpt,tg,fil])=>`
+    <tr><td style="font-weight:500;color:var(--text)">${op}</td>
+    <td class="tr mono">${txns.toLocaleString()}</td>
+    <td class="tr mono">${fmtGas(gpt)}</td>
+    <td class="tr mono">${fmtGas(tg)}</td>
+    <td class="tr mono">${fmtFIL(fil)}</td>
+    <td class="tr mono">${fmtUSD(toUSD(fil))}</td></tr>`).join('');
+  document.getElementById('tot-gas').textContent = fmtGas(totG);
+  document.getElementById('tot-fil').textContent = fmtFIL(totFIL);
+  document.getElementById('tot-usd').textContent = fmtUSD(toUSD(totFIL));
+  document.getElementById('breakdown-sub').textContent = days+'d · '+nDs+' datasets · EGP '+egp.toLocaleString()+' attoFIL/gas';
+
+  // Cost detail (burn + tip)
+  const detailOps=[
+    {op:'provePossession/tx', gas:ppGas},
+    {op:'nextProvingPeriod/tx', gas:nppGas},
+    {op:'addPieces ×'+batch+'/tx', gas:addBatchGas},
+  ];
+  if(nRem>0) detailOps.push({op:'removePieces ×'+nRem+'/tx', gas:remGas(nRem)});
+  document.getElementById('cost-detail-grid').innerHTML = detailOps.map(({op,gas})=>{
+    const burnF=burnFIL(gas,bf), tipF=tipFIL(gas,bf,prem,fc), totF=burnF+tipF;
+    return `<div class="cdc"><div class="cdc-op">${op}</div>
+      <div class="cdc-row"><span class="cdc-key">Gas used</span><span class="cdc-val">${fmtGas(gas)}</span></div>
+      <div class="cdc-row"><span class="cdc-key">Burned (BaseFee×gas)</span><span class="cdc-val burn">${fmtFIL(burnF)}</span></div>
+      <div class="cdc-row"><span class="cdc-key">SP tip (prem×gas)</span><span class="cdc-val tip">${fmtFIL(tipF)}</span></div>
+      <div class="cdc-row"><span class="cdc-key">Total</span><span class="cdc-val total">${fmtFIL(totF)} · ${fmtUSD(totF*filPrice)}</span></div>
+    </div>`;
+  }).join('');
+
+  // Summary
+  const dailyG   = (ppGas+nppGas)*nDs;
+  const dailyPct = (dailyG/GAS_TARGET*100).toFixed(4);
+  const dailyFIL = toFIL(dailyG);
+  const perDsMonth = toFIL((ppGas+nppGas)*30);
+  const perPieceFIL = nAdd>0 ? toFIL(addBatchGas)/batch : 0;
+  document.getElementById('sum-daily-gas').textContent = fmtGas(dailyG);
+  document.getElementById('sum-daily-pct').textContent = dailyPct+'% of daily gas target';
+  document.getElementById('sum-daily-fil').textContent = fmtFIL(dailyFIL);
+  document.getElementById('sum-daily-usd').textContent = fmtUSD(toUSD(dailyFIL))+'/day';
+  document.getElementById('sum-per-ds').textContent    = fmtUSD(toUSD(perDsMonth));
+  document.getElementById('sum-per-piece').textContent = nAdd>0?fmtFIL(perPieceFIL):'—';
+  document.getElementById('sum-per-piece-sub').textContent = nAdd>0?fmtUSD(toUSD(perPieceFIL))+'/piece · batch ×'+batch:'no uploads';
+
+  // Floor price
+  const floorFIL = (ppGas+nppGas)*egp/1e18*filPrice*30;
+  document.getElementById('floor-price-val').textContent = '$'+floorFIL.toFixed(4);
+  document.getElementById('floor-price-sub').textContent = ' per dataset per 30 days ('+nPcs+' pieces)';
+
+  // USD bar chart
+  drawCostChart(
+    ['provePossession','nextProvingPeriod','addPieces','removePieces'],
+    [toUSD(ppFIL),toUSD(nppFIL),toUSD(addFIL),toUSD(remFIL)]
+  );
+
+  // Update ref table prices when filPrice/egp changes
+  if(GAS) loadGasData();
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 async function init() {
-  onGasFeeChange(); // set initial EGP
+  document.getElementById('status-txt').textContent = 'Loading...';
+  onGasFeeChange();
   renderBatchTable();
   await Promise.allSettled([loadFILPrice(), loadGasData(), loadHistEGP()]);
   recalc();
-  // Draw PP chart after details is opened (canvas only renders when visible)
-  document.querySelector('details').addEventListener('toggle', function() {
+  document.querySelector('details')?.addEventListener('toggle', function() {
     if (this.open) drawPPChart();
   });
-  document.getElementById('status-txt').textContent = 'Live · ' + new Date().toLocaleTimeString();
+  if (window.location.hash==='#methodology') {
+    const el=document.getElementById('methodology');
+    if(el){el.open=true;setTimeout(()=>el.scrollIntoView({behavior:'smooth'}),300);}
+  }
+  document.getElementById('status-txt').textContent = 'Live · '+new Date().toLocaleTimeString();
 }
-
-// Slider sync on load
-document.getElementById('inp-pieces').addEventListener('input', () => {
-  const v = Math.log2(Math.max(1, parseInt(document.getElementById('inp-pieces').value) || 1));
-  document.getElementById('sl-pieces').value = Math.min(20, Math.max(0, v));
-});
 
 init();
 </script>
