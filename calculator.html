@@ -307,7 +307,7 @@ table.bt tfoot td { padding:9px 14px; font-weight:700; color:var(--text); backgr
         <th>Batch size</th><th class="tr">Gas/tx</th><th class="tr">Gas/piece</th><th class="tr">Saving vs ×1</th><th>Source</th>
       </tr></thead><tbody id="batch-tbody"></tbody></table>
     </div>
-    <div style="font-size:11px;color:var(--text3);margin-top:8px">Beyond ×10: no mainnet observations. Model extrapolated: 215M + 66M × K. Beyond ×368: tx exceeds tipset budget → stuck forever.</div>
+    <div style="font-size:11px;color:var(--text3);margin-top:8px">Beyond ×10: no mainnet observations. Model extrapolated: 228.72M + 78.20M × K. Beyond ×310: tx exceeds tipset budget → stuck forever.</div>
   </div>
 
   <!-- USAGE PARAMS -->
@@ -335,7 +335,7 @@ table.bt tfoot td { padding:9px 14px; font-weight:700; color:var(--text); backgr
         <div class="param-label">Batch size <span style="color:var(--text3);font-weight:400">→ pieces per addPieces tx</span></div>
         <div class="param-sub">Larger = cheaper per piece. <strong style="color:var(--orange)">K&gt;10: extrapolated. K&gt;368: stuck.</strong></div>
         <input class="param-input" type="number" id="inp-batch" value="1" min="1" max="368" oninput="recalc();checkBatch()">
-        <div class="warn-box" id="batch-warn">⚠ Beyond ×10: no mainnet data — linear extrapolation (215M + 66M×K). Beyond ×368: tx exceeds tipset budget → stuck forever.</div>
+        <div class="warn-box" id="batch-warn">⚠ Beyond ×10: no mainnet data — linear extrapolation (215M + 66M×K). Beyond ×310: tx exceeds tipset budget → stuck forever.</div>
       </div>
       <div class="param-group">
         <div class="param-label">Pieces to remove <span style="color:var(--text3);font-weight:400">→ removePieces cost</span></div>
@@ -461,10 +461,30 @@ const FIP_REGIMES = {
   post: { bf:200000, prem:28000,  fc:250000, note:'Post FIP-0115 (estimated): BaseFee ~222k, GasPremium ~28k. BaseFee becomes ~89% of EGP. Status: Draft.' },
 };
 
+// addPieces gas model: gas = 228.72M + 78.20M × K
+// Fitted on 90d mainnet data (K=1..9), R²=0.9996, MAE=3.4M
+// K=1..9: observed mainnet values (90d avg from FOC Observer)
+// K>9: linear extrapolation using fitted model
+// K>310: exceeds tipset budget (24.5 Bgas) → tx stuck forever
+const ADD_MODEL_ALPHA = 228.72e6;
+const ADD_MODEL_BETA  = 78.20e6;
+function addPiecesModel(k) { return ADD_MODEL_ALPHA + ADD_MODEL_BETA * k; }
+
 const BATCH_DATA = [
-  {k:1,gas:281.5e6,src:'observed'},{k:2,gas:295e6,src:'observed'},{k:3,gas:340e6,src:'observed'},
-  {k:5,gas:469e6,src:'observed'},{k:9,gas:719e6,src:'observed'},{k:10,gas:778e6,src:'observed'},
-  {k:20,gas:null,src:'extrapolated'},{k:50,gas:null,src:'extrapolated'},{k:100,gas:null,src:'extrapolated'},
+  {k:1, gas:309.1e6, src:'observed (90d avg)'},
+  {k:2, gas:378.5e6, src:'observed (90d avg)'},
+  {k:3, gas:460.2e6, src:'observed (90d avg)'},
+  {k:4, gas:544.2e6, src:'observed (90d avg)'},
+  {k:5, gas:625.2e6, src:'observed (90d avg)'},
+  {k:6, gas:703.1e6, src:'observed (90d avg)'},
+  {k:7, gas:774.8e6, src:'observed (90d avg)'},
+  {k:8, gas:853.5e6, src:'observed (90d avg)'},
+  {k:9, gas:929.0e6, src:'observed (90d avg)'},
+  {k:10,gas:null,    src:'model (extrapolated)'},
+  {k:20,gas:null,    src:'model (extrapolated)'},
+  {k:50,gas:null,    src:'model (extrapolated)'},
+  {k:100,gas:null,   src:'model (extrapolated)'},
+  {k:310,gas:null,   src:'⚠ tipset budget limit'},
 ];
 
 const PP_DATA = [[1,149.9],[2,152.5],[4,158.7],[8,164.3],[16,160.6],[32,169.7],[64,172.8],[128,172.6],[256,139.8],[512,184.8],[1024,191.1],[4096,209.4],[8192,208.2],[65536,176.1],[134217728,279.1]];
@@ -525,7 +545,12 @@ function fmtGas(g) {
   if (g>=1e9)  return (g/1e9).toFixed(2)+' Ggas';
   return (g/1e6).toFixed(0)+'M gas';
 }
-function fmtFIL(f) { return f.toFixed(6)+' FIL'; }
+function fmtFIL(f) {
+  if (f === 0) return '0 FIL';
+  if (f < 0.000001) return f.toExponential(3)+' FIL';
+  if (f < 0.0001)   return f.toFixed(9)+' FIL';
+  return f.toFixed(6)+' FIL';
+}
 function fmtUSD(u) {
   if (u<0.0001) return '<$0.0001';
   if (u<1) return '$'+u.toFixed(4);
@@ -586,7 +611,7 @@ function applyHistEGP(period) {
 function renderBatchTable() {
   const base1 = 281.5e6;
   document.getElementById('batch-tbody').innerHTML = BATCH_DATA.map(({k,gas,src}) => {
-    const g = gas!==null ? gas : 215e6+66e6*k;
+    const g = gas!==null ? gas : addPiecesModel(k);
     const gpp = g/k;
     const saving = k>1 ? ((base1-gpp)/base1*100).toFixed(0)+'%' : '—';
     const dim = src==='extrapolated' ? 'color:var(--text3)' : '';
@@ -713,13 +738,14 @@ async function loadGasData() {
     {label:'provePossession',key:'provePossession',note:'per proof'},
     {label:'nextProvingPeriod',key:'nextProvingPeriod',note:'per period'},
     {label:'addPieces ×1',key:'addPieces_1',note:'per tx'},
-    {label:'addPieces ×10',key:'addPieces_10',note:'per tx'},
+    {label:'addPieces ×10',key:'addPieces_10',note:'per tx',fallback:778e6},
     {label:'createDataSet',key:'createDataSet',note:cdn?'CDN':'no CDN'},
     {label:'terminateService',key:'terminateService',note:cdn?'CDN':'no CDN'},
     {label:'removePieces ×1',key:'removePieces_1',note:'per tx'},
   ];
-  document.getElementById('gas-ref-grid').innerHTML = ops.map(({label,key,note})=>{
-    let gas = GAS[key] || 0;
+  const ADD_FALLBACKS = {'addPieces_1':281.5e6,'addPieces_2':295e6,'addPieces_5':469e6,'addPieces_10':778e6};
+  document.getElementById('gas-ref-grid').innerHTML = ops.map(({label,key,note,fallback})=>{
+    let gas = GAS[key] || fallback || ADD_FALLBACKS[key] || 0;
     if (key==='createDataSet' && cdn) gas += 45e6;
     if (key==='terminateService' && cdn) gas += 105e6;
     const fil = gasCostFIL(gas);
@@ -791,9 +817,18 @@ function recalc() {
   const ppGas  = GAS?.provePossession || ppG;
   const nppGas = GAS?.nextProvingPeriod || NPP_GAS;
 
+  // Observed mainnet values as fallback (from BATCH_DATA)
+  const ADD_OBS = {1:281.5e6,2:295e6,3:340e6,5:469e6,9:719e6,10:778e6};
+  // addPieces: live FOC data → 90d observed fallback → linear model
+  const ADD_OBS_90D = {1:309.1e6,2:378.5e6,3:460.2e6,4:544.2e6,5:625.2e6,6:703.1e6,7:774.8e6,8:853.5e6,9:929.0e6};
   let addBatchGas;
-  if (batch<=10 && GAS && GAS['addPieces_'+batch]) addBatchGas = GAS['addPieces_'+batch];
-  else addBatchGas = 215e6 + 66e6 * batch;
+  if (GAS && GAS['addPieces_'+batch] && GAS['addPieces_'+batch]>0) {
+    addBatchGas = GAS['addPieces_'+batch];
+  } else if (ADD_OBS_90D[batch]) {
+    addBatchGas = ADD_OBS_90D[batch];
+  } else {
+    addBatchGas = addPiecesModel(batch);
+  }
 
   let createG = (GAS?.createDataSet || 796e6) + (cdn?45e6:0);
   let termG   = (GAS?.terminateService || 136e6) + (cdn?105e6:0);
@@ -891,7 +926,10 @@ async function init() {
   });
   if (window.location.hash==='#methodology') {
     const el=document.getElementById('methodology');
-    if(el){el.open=true;setTimeout(()=>el.scrollIntoView({behavior:'smooth'}),300);}
+    if(el){
+      el.open=true;
+      setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),400);
+    }
   }
   document.getElementById('status-txt').textContent = 'Live · '+new Date().toLocaleTimeString();
 }
