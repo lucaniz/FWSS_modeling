@@ -170,7 +170,7 @@ table.bt tfoot td { padding: 10px 14px; font-weight: 700; color: var(--text); ba
       </div>
       <div class="gas-input-group">
         <div class="gas-input-label">Gas premium <span style="font-weight:400;color:var(--text3)">(attoFIL/gas)</span></div>
-        <div class="gas-input-sub">Tip to miner. Min ~100,000. Avg 30d: 252,105.</div>
+        <div class="gas-input-sub">Tip to SP (Storage Provider). Min ~100,000. Avg 30d: 252,105.</div>
         <input class="gas-input" type="number" id="inp-premium" value="252105" min="100000" step="10000" oninput="onGasFeeChange()">
         <div class="presets" id="prem-presets">
           <button class="preset-btn active" onclick="setPreset('prem',252105,this)">30d avg</button>
@@ -200,8 +200,8 @@ table.bt tfoot td { padding: 10px 14px; font-weight: 700; color: var(--text); ba
     <div class="formula-note">
       <strong>Formula (from Lotus source):</strong>
       <code>effective_gas_price = BaseFee + min(GasPremium, GasFeeCap − BaseFee)</code><br>
-      Total tx cost = <code>GasUsed × BaseFee</code> (burned) + <code>GasUsed × effective_premium</code> (to miner) + overestimation burn on unused gas above 10% tolerance.<br>
-      Today (pre FIP-0115) with BaseFee ≈ 100 attoFIL, the miner premium dominates (~99.9% of the fee is burned as burn+tip, but mostly tip). Under FIP-0115 (Draft), BaseFee would rise to ~90% of EGP — burn dominates, miners earn less tip. Use the toggle below to model both scenarios.
+      Total tx cost = <code>GasUsed × BaseFee</code> (burned) + <code>GasUsed × effective_premium</code> (to SP) + overestimation burn on unused gas above 10% tolerance.<br>
+      Today (pre FIP-0115) with BaseFee ≈ 100 attoFIL, the SP premium dominates (~99.9% of the fee is burned as burn+tip, but mostly tip). Under FIP-0115 (Draft), BaseFee would rise to ~90% of EGP — burn dominates, SPs earn less tip. Use the toggle below to model both scenarios.
     </div>
 
     <!-- FIP-0115 TOGGLE -->
@@ -216,6 +216,49 @@ table.bt tfoot td { padding: 10px 14px; font-weight: 700; color: var(--text); ba
         </button>
       </div>
       <div style="font-size:11px;color:var(--text3)" id="fip-note">BaseFee ≈ 0.04% of effective gas price today</div>
+    </div>
+  </div>
+
+  <!-- HISTORICAL EGP + CDN -->
+  <div style="display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start;margin-bottom:20px">
+    <div class="gas-fee-panel" style="margin-bottom:0">
+      <div class="section-title" style="margin-bottom:8px">Historical effective gas price (from real FWSS transactions)</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap" id="hist-egp-row">
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:8px 14px;min-width:100px">
+          <div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">24h avg</div>
+          <div style="font-family:var(--mono);font-size:14px;font-weight:700" id="egp-24h">—</div>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:8px 14px;min-width:100px">
+          <div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">30d avg</div>
+          <div style="font-family:var(--mono);font-size:14px;font-weight:700" id="egp-30d">—</div>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:8px 14px;min-width:100px">
+          <div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">90d avg</div>
+          <div style="font-family:var(--mono);font-size:14px;font-weight:700" id="egp-90d">—</div>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:8px 14px;min-width:100px">
+          <div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">observed min</div>
+          <div style="font-family:var(--mono);font-size:14px;font-weight:700" id="egp-min">—</div>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:8px 14px;min-width:100px">
+          <div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">observed max</div>
+          <div style="font-family:var(--mono);font-size:14px;font-weight:700" id="egp-max">—</div>
+        </div>
+        <button class="preset-btn" style="align-self:center" onclick="applyHistEGP('24h')">Use 24h avg</button>
+        <button class="preset-btn" style="align-self:center" onclick="applyHistEGP('30d')">Use 30d avg</button>
+      </div>
+    </div>
+    <div class="gas-fee-panel" style="margin-bottom:0;min-width:200px">
+      <div class="section-title" style="margin-bottom:8px">CDN dataset</div>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--text2)">
+        <input type="checkbox" id="cdn-toggle" onchange="recalc()" style="width:16px;height:16px;accent-color:var(--blue)">
+        Dataset has CDN enabled
+      </label>
+      <div style="font-size:11px;color:var(--text3);margin-top:6px;line-height:1.5">
+        CDN datasets use 3 FilecoinPay rails instead of 1.<br>
+        createDataSet: +45M gas (~840M total)<br>
+        terminateService: +105M gas (~241M total)
+      </div>
     </div>
   </div>
 
@@ -243,6 +286,26 @@ table.bt tfoot td { padding: 10px 14px; font-weight: 700; color: var(--text); ba
   <div class="section-title">Gas per operation (live from FOC Observer)</div>
   <div class="gas-ref-grid" id="gas-ref-grid">
     <div class="loading"><div class="spinner"></div>Loading...</div>
+  </div>
+
+  <!-- BATCHING TABLE -->
+  <div class="gas-fee-panel" style="margin-bottom:20px">
+    <div class="section-title" style="margin-bottom:10px">addPieces batching savings (observed mainnet data)</div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead><tr>
+          <th style="text-align:left;padding:7px 12px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);background:var(--bg);border-bottom:1px solid var(--border)">Batch size</th>
+          <th style="text-align:right;padding:7px 12px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);background:var(--bg);border-bottom:1px solid var(--border)">Gas/tx</th>
+          <th style="text-align:right;padding:7px 12px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);background:var(--bg);border-bottom:1px solid var(--border)">Gas/piece</th>
+          <th style="text-align:right;padding:7px 12px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);background:var(--bg);border-bottom:1px solid var(--border)">Saving vs ×1</th>
+          <th style="text-align:left;padding:7px 12px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);background:var(--bg);border-bottom:1px solid var(--border)">Source</th>
+        </tr></thead>
+        <tbody id="batch-tbody"></tbody>
+      </table>
+    </div>
+    <div style="font-size:11px;color:var(--text3);margin-top:8px">
+      Beyond ×10: no mainnet observations. Model extrapolated linearly (215M + 66M × K) — consistent with FVM SSTORE cost per piece but unverified.
+    </div>
   </div>
 
   <!-- USAGE PARAMETERS -->
@@ -316,7 +379,7 @@ table.bt tfoot td { padding: 10px 14px; font-weight: 700; color: var(--text); ba
 
     <!-- COST DETAIL per operation -->
     <div class="cost-detail">
-      <div class="cost-detail-title">Transaction cost breakdown per operation (burn + miner tip)</div>
+      <div class="cost-detail-title">Transaction cost breakdown per operation (burn + SP tip)</div>
       <div class="cost-detail-grid" id="cost-detail-grid"></div>
     </div>
   </div>
@@ -344,6 +407,59 @@ table.bt tfoot td { padding: 10px 14px; font-weight: 700; color: var(--text); ba
       <div class="sum-sub" id="sum-per-piece-sub">—</div>
     </div>
   </div>
+
+  <!-- METHODOLOGY -->
+  <details style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:20px;box-shadow:var(--shadow)">
+    <summary style="padding:16px 20px;cursor:pointer;font-size:14px;font-weight:600;list-style:none;display:flex;justify-content:space-between;align-items:center;user-select:none">
+      Methodology — how the models work
+      <span style="font-size:12px;color:var(--text3);font-weight:400">click to expand</span>
+    </summary>
+    <div style="padding:0 20px 20px;border-top:1px solid var(--border)">
+
+      <div style="margin-top:16px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:8px">provePossession model</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:12px">
+          Gas scales logarithmically with piece count N (number of Merkle roots in the dataset).
+          This is because provePossession traverses a Sum Tree of depth log₂(N) on-chain — 5 challenges × O(log₂N) SLOAD operations.
+          Piece <em>size</em> (leafCount) is irrelevant — it's stored as a value in Sum Tree nodes for proportional sampling, not as tree depth.
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 16px;font-family:var(--mono);font-size:13px;margin-bottom:12px">
+          gas = 158.67M + 8.485M × log₂(pieces)<br>
+          <span style="font-size:11px;color:var(--text3)">R² = 0.9551 · MAE = 4.8M gas · fitted on 670 real mainnet datasets · refitted daily</span>
+        </div>
+        <!-- PP model chart -->
+        <canvas id="pp-chart" width="600" height="200" style="width:100%;max-width:600px;border:1px solid var(--border);border-radius:8px;background:var(--bg)"></canvas>
+      </div>
+
+      <div style="margin-top:20px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:8px">removePieces model</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.7">
+          Gas scales sublinearly with K (pieces removed per tx) because within the same transaction, multiple pieces share Sum Tree ancestor nodes — warm access costs ~200 gas instead of ~5,000.
+          The O(K × log₂N) theoretical formula from the contract code is not clearly confirmed by observed data (N is not tracked at removal time in FOC Observer).
+          Both calculators use the same model: observed values for K≤144, linear interpolation between observed points, K^0.614 extrapolation beyond K=144 (unobserved).
+        </div>
+      </div>
+
+      <div style="margin-top:20px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:8px">Gas fee model</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.7">
+          From <a href="https://github.com/filecoin-project/lotus/blob/master/chain/types/message.go" target="_blank" style="color:var(--blue)">Lotus source</a>:
+          <code style="background:var(--bg);border:1px solid var(--border);padding:1px 6px;border-radius:3px;font-size:11px">effective_gas_price = BaseFee + min(GasPremium, GasFeeCap − BaseFee)</code><br>
+          Total cost = GasUsed × BaseFee (burned) + GasUsed × effective_premium (to SP) + overestimation burn.<br>
+          Today: BaseFee ≈ 100 attoFIL, GasPremium ≈ 252,000 → SP tip dominates (99.9% of fee).
+          Under FIP-0115 (Draft): BaseFee would rise to ~90% of EGP.
+        </div>
+      </div>
+
+      <div style="margin-top:20px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:8px">Data sources</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.7">
+          Gas values: FOC Observer mainnet (live, queried on page load) · EGP history: FOC Observer <code style="font-size:11px">effective_gas_price</code> field on real FWSS transactions · FIL price: CoinGecko · Model refit: GitHub Actions daily at 09:00 UTC.
+        </div>
+      </div>
+
+    </div>
+  </details>
 
 </div>
 
@@ -376,7 +492,7 @@ const FIP_REGIMES = {
     basefee: 200000,
     premium: 28000,
     feecap:  250000,
-    note: 'Post FIP-0115 (estimated): at equilibrium Premium₂₀ / BaseFee = 1/8. If total EGP stays ~250k, BaseFee ~ 222k and Premium ~ 28k. BaseFee becomes ~89% of the fee — burn dominates over miner tip. NOTE: FIP-0115 is still in Draft status.',
+    note: 'Post FIP-0115 (estimated): at equilibrium Premium₂₀ / BaseFee = 1/8. If total EGP stays ~250k, BaseFee ~ 222k and Premium ~ 28k. BaseFee becomes ~89% of the fee — burn dominates over SP tip. NOTE: FIP-0115 is still in Draft status.',
   },
 };
 
@@ -404,7 +520,7 @@ function effectiveGasPrice(bf, prem, fc) {
 }
 
 // Total tx cost in FIL = gas_used * egp / 1e18
-// (This approximates the full cost: base_burn + miner_tip + overestimation_burn)
+// (This approximates the full cost: base_burn + sp_tip + overestimation_burn)
 // The overestimation burn is typically small (<5%) and we flag it.
 function gasCostFIL(gasUsed, egp) {
   return gasUsed * egp / 1e18;
@@ -415,7 +531,7 @@ function burnFIL(gasUsed, bf) {
   return gasUsed * bf / 1e18;
 }
 
-// Miner tip = gasUsed * effectivePremium / 1e18 (approx, using gasUsed not gasLimit)
+// SP tip = gasUsed * effectivePremium / 1e18 (approx, using gasUsed not gasLimit)
 function tipFIL(gasUsed, bf, prem, fc) {
   const effPrem = Math.min(prem, Math.max(0, fc - bf));
   return gasUsed * effPrem / 1e18;
@@ -527,7 +643,9 @@ function recalc() {
   const ppGasUsed  = GAS?.provePossession || ppG;
   const nppGasUsed = GAS?.nextProvingPeriod || nppG;
   const addGasUsed = GAS?.addPieces1 || 281e6;
-  const createG    = GAS?.createDataSet || 796e6;
+  const cdn        = isCDN();
+  const createG    = cdn ? (GAS?.createDataSetCDN || 840e6) : (GAS?.createDataSet || 796e6);
+  const termGas    = cdn ? 241e6 : 136e6;
   const termG      = GAS?.terminateService || 136e6;
 
   // Tx counts
@@ -592,8 +710,8 @@ function recalc() {
     return `<div class="cdc">
       <div class="cdc-op">${op}</div>
       <div class="cdc-row"><span class="cdc-key">Gas used</span><span class="cdc-val">${fmtGas(gas)}</span></div>
-      <div class="cdc-row"><span class="cdc-key">Burned (BaseFee × gas)</span><span class="cdc-val burn">${fmtFIL(burnF)}</span></div>
-      <div class="cdc-row"><span class="cdc-key">Miner tip (Premium × gas)</span><span class="cdc-val tip">${fmtFIL(tipF)}</span></div>
+      <div class="cdc-row"><span class="cdc-key">Burned (BaseFee × GasUsed)</span><span class="cdc-val burn">${fmtFIL(burnF)}</span></div>
+      <div class="cdc-row"><span class="cdc-key">SP tip (effective_premium × GasUsed)</span><span class="cdc-val tip">${fmtFIL(tipF)}</span></div>
       <div class="cdc-row"><span class="cdc-key">Total</span><span class="cdc-val total">${fmtFIL(totF)} · ${fmtUSD(totF * filPrice)}</span></div>
     </div>`;
   }).join('');
@@ -675,11 +793,173 @@ async function loadFILPrice() {
   } catch(e) {}
 }
 
+// ── Historical EGP ───────────────────────────────────────────────────────────
+let HIST_EGP = {};
+
+async function loadHistEGP() {
+  const r = await fetch('https://foc-observer.va.gg/sql', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      sql: `SELECT
+        ROUND(AVG(CASE WHEN timestamp >= EXTRACT(EPOCH FROM NOW())-86400 THEN effective_gas_price END)) as h24,
+        ROUND(AVG(CASE WHEN timestamp >= EXTRACT(EPOCH FROM NOW())-86400*30 THEN effective_gas_price END)) as h30d,
+        ROUND(AVG(CASE WHEN timestamp >= EXTRACT(EPOCH FROM NOW())-86400*90 THEN effective_gas_price END)) as h90d,
+        ROUND(MIN(effective_gas_price)) as hmin,
+        ROUND(MAX(effective_gas_price)) as hmax
+        FROM pdp_possession_proven`,
+      network: 'mainnet'
+    })
+  });
+  const d = await r.json();
+  const row = d.rows[0];
+  HIST_EGP = { h24: parseFloat(row.h24), h30d: parseFloat(row.h30d), h90d: parseFloat(row.h90d), hmin: parseFloat(row.hmin), hmax: parseFloat(row.hmax) };
+  document.getElementById('egp-24h').textContent = HIST_EGP.h24.toLocaleString();
+  document.getElementById('egp-30d').textContent = HIST_EGP.h30d.toLocaleString();
+  document.getElementById('egp-90d').textContent = HIST_EGP.h90d.toLocaleString();
+  document.getElementById('egp-min').textContent = HIST_EGP.hmin.toLocaleString();
+  document.getElementById('egp-max').textContent = HIST_EGP.hmax.toLocaleString();
+}
+
+function applyHistEGP(period) {
+  const val = period === '24h' ? HIST_EGP.h24 : HIST_EGP.h30d;
+  if (!val) return;
+  // Decompose: set basefee=100, feecap=val+100, premium=val-100
+  document.getElementById('inp-basefee').value = 100;
+  document.getElementById('inp-premium').value = Math.round(val - 100);
+  document.getElementById('inp-feecap').value  = Math.round(val + 1000);
+  document.querySelectorAll('#bf-presets .preset-btn, #prem-presets .preset-btn, #fc-presets .preset-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('fip-pre').classList.add('active');
+  document.getElementById('fip-post').classList.remove('active');
+  document.getElementById('fip-note').textContent = 'Using ' + period + ' average effective gas price from real FWSS transactions';
+  onGasFeeChange();
+}
+
+// ── Batching table ────────────────────────────────────────────────────────────
+const BATCH_DATA = [
+  { k: 1,   gas: 281.5e6, src: 'observed' },
+  { k: 2,   gas: 295.0e6, src: 'observed' },
+  { k: 3,   gas: 340.0e6, src: 'observed' },
+  { k: 5,   gas: 469.0e6, src: 'observed' },
+  { k: 9,   gas: 719.0e6, src: 'observed' },
+  { k: 10,  gas: 778.0e6, src: 'observed' },
+  { k: 20,  gas: null,    src: 'extrapolated' },
+  { k: 100, gas: null,    src: 'extrapolated' },
+];
+
+function renderBatchTable() {
+  const base1 = 281.5e6;
+  const rows = BATCH_DATA.map(({ k, gas, src }) => {
+    const g = gas !== null ? gas : 215e6 + 66e6 * k;
+    const gpp = g / k;
+    const saving = ((base1 - gpp) / base1 * 100).toFixed(0);
+    const color = src === 'extrapolated' ? 'color:var(--text3)' : '';
+    return `<tr style="${color}">
+      <td style="padding:7px 12px;border-bottom:1px solid var(--border);font-weight:500">×${k}</td>
+      <td style="padding:7px 12px;border-bottom:1px solid var(--border);text-align:right;font-family:var(--mono);font-size:12px">${fmtGas(g)}</td>
+      <td style="padding:7px 12px;border-bottom:1px solid var(--border);text-align:right;font-family:var(--mono);font-size:12px">${fmtGas(gpp)}</td>
+      <td style="padding:7px 12px;border-bottom:1px solid var(--border);text-align:right;font-family:var(--mono);font-size:12px;color:var(--green)">${k > 1 ? saving + '%' : '—'}</td>
+      <td style="padding:7px 12px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text3)">${src}</td>
+    </tr>`;
+  }).join('');
+  const el = document.getElementById('batch-tbody');
+  if (el) el.innerHTML = rows;
+}
+
+// ── PP model chart ────────────────────────────────────────────────────────────
+function drawPPChart() {
+  const canvas = document.getElementById('pp-chart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const PAD = { l: 60, r: 20, t: 20, b: 40 };
+
+  // Data points from real mainnet (representative)
+  const pts = [
+    [1,158],[2,164],[4,170],[8,176],[16,182],[32,188],[64,194],
+    [128,200],[256,206],[512,212],[1024,218],[4096,230],[16384,242],
+    [65536,254],[262144,266],[868515,278]
+  ];
+
+  const xMin = 0, xMax = 20; // log2 scale
+  const yMin = 140, yMax = 290; // Mgas
+
+  const toX = v => PAD.l + (Math.log2(Math.max(1,v)) - xMin) / (xMax - xMin) * (W - PAD.l - PAD.r);
+  const toY = v => H - PAD.b - (v - yMin) / (yMax - yMin) * (H - PAD.t - PAD.b);
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Grid
+  ctx.strokeStyle = '#e8eaef'; ctx.lineWidth = 1;
+  [160,180,200,220,240,260,280].forEach(y => {
+    ctx.beginPath(); ctx.moveTo(PAD.l, toY(y)); ctx.lineTo(W-PAD.r, toY(y)); ctx.stroke();
+    ctx.fillStyle = '#9198b0'; ctx.font = '10px Inter'; ctx.textAlign = 'right';
+    ctx.fillText(y + 'M', PAD.l-5, toY(y)+4);
+  });
+  [1,4,16,64,256,1024,4096,16384,65536,262144].forEach(x => {
+    ctx.beginPath(); ctx.moveTo(toX(x), PAD.t); ctx.lineTo(toX(x), H-PAD.b); ctx.stroke();
+    ctx.fillStyle = '#9198b0'; ctx.font = '9px Inter'; ctx.textAlign = 'center';
+    ctx.fillText(x >= 1000 ? (x/1000)+'k' : x+'', toX(x), H-PAD.b+14);
+  });
+
+  // Model line
+  ctx.strokeStyle = '#3b6ff5'; ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (let x = 1; x <= 1000000; x *= 1.1) {
+    const y = 158.67 + 8.485 * Math.log2(x);
+    const px = toX(x), py = toY(y);
+    x === 1 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+  }
+  ctx.stroke();
+
+  // 99% confidence band (±2×MAE ≈ ±9.6M)
+  ctx.fillStyle = 'rgba(59,111,245,0.08)';
+  ctx.beginPath();
+  for (let x = 1; x <= 1000000; x *= 1.1) {
+    const y = 158.67 + 8.485 * Math.log2(x) + 9.6;
+    ctx.lineTo(toX(x), toY(y));
+  }
+  for (let x = 1000000; x >= 1; x /= 1.1) {
+    const y = 158.67 + 8.485 * Math.log2(x) - 9.6;
+    ctx.lineTo(toX(x), toY(y));
+  }
+  ctx.closePath(); ctx.fill();
+
+  // Data points
+  ctx.fillStyle = '#1a1d2e';
+  pts.forEach(([x, y]) => {
+    ctx.beginPath();
+    ctx.arc(toX(x), toY(y), 3, 0, Math.PI*2);
+    ctx.fill();
+  });
+
+  // Labels
+  ctx.fillStyle = '#5a6075'; ctx.font = '11px Inter'; ctx.textAlign = 'center';
+  ctx.fillText('Pieces per dataset (log₂ scale)', W/2, H-4);
+  ctx.save(); ctx.translate(14, H/2); ctx.rotate(-Math.PI/2);
+  ctx.fillText('Gas used (M)', 0, 0); ctx.restore();
+
+  // Legend
+  ctx.fillStyle = '#3b6ff5'; ctx.font = '11px Inter'; ctx.textAlign = 'left';
+  ctx.fillText('— model fit (R²=0.9551)', PAD.l+8, PAD.t+14);
+  ctx.fillStyle = 'rgba(59,111,245,0.4)';
+  ctx.fillRect(PAD.l+8, PAD.t+22, 30, 6);
+  ctx.fillStyle = '#9198b0'; ctx.font = '11px Inter';
+  ctx.fillText('95% confidence band', PAD.l+44, PAD.t+29);
+}
+
+// ── CDN gas adjustment ────────────────────────────────────────────────────────
+function isCDN() { return document.getElementById('cdn-toggle')?.checked || false; }
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 async function init() {
   onGasFeeChange(); // set initial EGP
-  await Promise.allSettled([loadFILPrice(), loadGasData()]);
+  renderBatchTable();
+  await Promise.allSettled([loadFILPrice(), loadGasData(), loadHistEGP()]);
   recalc();
+  // Draw PP chart after details is opened (canvas only renders when visible)
+  document.querySelector('details').addEventListener('toggle', function() {
+    if (this.open) drawPPChart();
+  });
   document.getElementById('status-txt').textContent = 'Live · ' + new Date().toLocaleTimeString();
 }
 
