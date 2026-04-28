@@ -89,12 +89,12 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text); min-
     <p>Theoretical bounds from contract source code — addPieces stuck thresholds, NPP with 2,000 pending removals, SP failure scenarios. Models what hasn't happened yet.</p>
   </a>
 
-  <div class="card green" style="cursor:default">
-    <div class="card-tag">Data</div>
+  <a href="calculator.html#methodology" class="card green">
+    <div class="card-tag">Methodology</div>
     <div class="card-icon">🔬</div>
     <h2>Model Notes</h2>
-    <p>provePossession model: <code style="font-family:var(--mono);font-size:11px">158.67M + 8.485M × log₂(N)</code> fitted on 670 real mainnet datasets (R²=0.9551). Effective gas price = BaseFee + min(GasPremium, GasFeeCap − BaseFee).</p>
-  </div>
+    <p>provePossession: <code style="font-family:var(--mono);font-size:11px">158.67M + 8.485M × log₂(N)</code> · R²=0.9551 · 670 datasets · refitted daily. Gas fee: <code style="font-family:var(--mono);font-size:11px">EGP = BaseFee + min(Premium, FeeCap−BaseFee)</code>. Full methodology in the calculator.</p>
+  </a>
 </div>
 
 <div class="footer">
