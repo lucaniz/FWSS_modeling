@@ -114,6 +114,7 @@ table.dist tr:last-child td { border-bottom: none; }
   </div>
   <div class="header-right">
     <div class="live-badge"><div class="live-dot"></div><span id="status-txt">Loading...</span></div>
+    <button class="nav-link" onclick="loadData()" style="cursor:pointer">↺ Refresh</button>
     <a href="calculator.html" class="nav-link">⚡ Calculator</a>
     <a href="extreme_modeling.html" class="nav-link">🔴 Extreme</a>
     <a href="index.html" class="nav-link">← Index</a>
@@ -180,23 +181,67 @@ table.dist tr:last-child td { border-bottom: none; }
       <button class="tab-btn" onclick="setScenario('peak',this)">Peak (Dec 12, 2024)</button>
     </div>
     <div class="scenario-body">
-      <div class="scenario-grid">
+
+      <!-- USER INPUTS -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)">
+        <div>
+          <div class="sc-label" style="margin-bottom:4px">Your datasets</div>
+          <input type="number" id="inp-my-ds" value="475" min="1" max="1000000"
+            style="border:1px solid var(--border-s);border-radius:6px;padding:7px 10px;font-family:var(--mono);font-size:14px;font-weight:700;color:var(--text);background:var(--bg);width:100%"
+            oninput="updateScenario()">
+          <div style="font-size:11px;color:var(--text3);margin-top:3px">number of active datasets</div>
+        </div>
+        <div>
+          <div class="sc-label" style="margin-bottom:4px">Avg pieces per dataset</div>
+          <input type="number" id="inp-my-pieces" value="500" min="1" max="1000000"
+            style="border:1px solid var(--border-s);border-radius:6px;padding:7px 10px;font-family:var(--mono);font-size:14px;font-weight:700;color:var(--text);background:var(--bg);width:100%"
+            oninput="updateScenario()">
+          <div style="font-size:11px;color:var(--text3);margin-top:3px">drives provePossession gas via log₂(N)</div>
+        </div>
+        <div>
+          <div class="sc-label" style="margin-bottom:4px">FWSS gas/dataset/day</div>
+          <div style="border:1px solid var(--blue-b);border-radius:6px;padding:7px 10px;background:var(--blue-bg)">
+            <div style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--blue)" id="sc-gas-per-ds">—</div>
+            <div style="font-size:10px;color:var(--text3);margin-top:2px">Mgas · computed from model</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESULTS -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:12px">
         <div class="sc-stat">
           <div class="sc-label">Non-FWSS gas</div>
           <div class="sc-value" id="sc-bg">—</div>
           <div class="sc-sub">Ggas/day</div>
         </div>
         <div class="sc-stat">
-          <div class="sc-label">FWSS headroom</div>
+          <div class="sc-label">Your FWSS gas</div>
+          <div class="sc-value" id="sc-fwss">—</div>
+          <div class="sc-sub" id="sc-fwss-pct">Ggas/day</div>
+        </div>
+        <div class="sc-stat">
+          <div class="sc-label">Headroom left</div>
           <div class="sc-value" id="sc-hw">—</div>
           <div class="sc-sub">Ggas/day remaining</div>
         </div>
         <div class="sc-stat">
-          <div class="sc-label">Max FWSS datasets</div>
+          <div class="sc-label">Max datasets (budget)</div>
           <div class="sc-value" id="sc-max">—</div>
-          <div class="sc-sub">at weighted avg gas/dataset</div>
+          <div class="sc-sub">at your avg piece count</div>
         </div>
       </div>
+
+      <!-- USAGE BAR -->
+      <div style="height:20px;background:var(--bg);border:1px solid var(--border);border-radius:5px;overflow:hidden;display:flex;margin-bottom:6px">
+        <div id="sc-bar-bg"   style="background:#d1d5db;height:100%;transition:width .3s"></div>
+        <div id="sc-bar-fwss" style="background:var(--blue);height:100%;transition:width .3s"></div>
+        <div id="sc-bar-free" style="background:#f0fdf4;height:100%;transition:width .3s"></div>
+      </div>
+      <div style="display:flex;gap:14px;font-size:11px;color:var(--text3);margin-bottom:10px">
+        <span>▪ Non-FWSS</span><span style="color:var(--blue)">▪ Your FWSS</span><span style="color:var(--green)">▪ Headroom</span>
+        <span id="sc-status" style="margin-left:auto;font-weight:600"></span>
+      </div>
+
       <div class="sc-note" id="sc-note">—</div>
     </div>
   </div>
@@ -255,18 +300,62 @@ const SCENARIOS = {
   peak:   { bg: 51381, note: 'Single-day peak on December 12, 2024. Network at 72.8% of gas target — highest in recent history.' },
 };
 
+let currentBg = 15327; // Ggas
+
 function setScenario(key, btn) {
   const sc = SCENARIOS[key];
-  const hw = GAS_TARGET_GGAS - sc.bg;
-  const maxDs = Math.floor(hw * 1e9 / (AVG_GAS_PER_DS * 1e6));
-
-  document.getElementById('sc-bg').textContent   = sc.bg.toLocaleString();
-  document.getElementById('sc-hw').textContent   = hw.toLocaleString();
-  document.getElementById('sc-max').textContent  = maxDs.toLocaleString();
+  currentBg = sc.bg;
   document.getElementById('sc-note').textContent = sc.note;
-
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
+  updateScenario();
+}
+
+function gasPerDataset(nPieces) {
+  // provePossession: 158.67M + 8.485M * log2(N)
+  // nextProvingPeriod: 124M
+  // both happen once per day
+  const pp  = 158.67e6 + 8.485e6 * Math.log2(Math.max(1, nPieces));
+  const npp = 124e6;
+  return pp + npp; // gas/day per dataset
+}
+
+function updateScenario() {
+  const myDs     = parseInt(document.getElementById('inp-my-ds').value)     || 475;
+  const myPieces = parseInt(document.getElementById('inp-my-pieces').value) || 500;
+
+  const gasPerDs = gasPerDataset(myPieces);           // gas/day
+  const myFwssGgas = myDs * gasPerDs / 1e9;           // Ggas/day
+  const hw = GAS_TARGET_GGAS - currentBg - myFwssGgas;
+  const maxDs = Math.floor((GAS_TARGET_GGAS - currentBg) * 1e9 / gasPerDs);
+  const fwssPct = (myFwssGgas / GAS_TARGET_GGAS * 100).toFixed(3);
+  const totalUsed = currentBg + myFwssGgas;
+  const congested = totalUsed > GAS_TARGET_GGAS;
+
+  document.getElementById('sc-gas-per-ds').textContent = (gasPerDs/1e6).toFixed(0) + ' Mgas';
+  document.getElementById('sc-bg').textContent         = currentBg.toLocaleString();
+  document.getElementById('sc-fwss').textContent       = myFwssGgas.toFixed(1) + ' Ggas';
+  document.getElementById('sc-fwss-pct').textContent   = fwssPct + '% of daily target';
+  document.getElementById('sc-hw').textContent         = Math.max(0, hw).toFixed(0) + ' Ggas';
+  document.getElementById('sc-max').textContent        = maxDs.toLocaleString();
+
+  // Bar
+  const tot = GAS_TARGET_GGAS;
+  document.getElementById('sc-bar-bg').style.width   = Math.min(100, currentBg/tot*100).toFixed(1)+'%';
+  document.getElementById('sc-bar-fwss').style.width = Math.min(100, myFwssGgas/tot*100).toFixed(1)+'%';
+  document.getElementById('sc-bar-free').style.width = Math.max(0, (tot-currentBg-myFwssGgas)/tot*100).toFixed(1)+'%';
+
+  const status = document.getElementById('sc-status');
+  if (congested) {
+    status.textContent = '⚠ Exceeds daily target — base fee would spike';
+    status.style.color = 'var(--red)';
+  } else if (hw < 5000) {
+    status.textContent = '⚠ Less than 5,000 Ggas headroom';
+    status.style.color = 'var(--orange)';
+  } else {
+    status.textContent = '✓ Within budget';
+    status.style.color = 'var(--green)';
+  }
 }
 
 async function loadData() {
@@ -334,8 +423,10 @@ async function loadData() {
   document.getElementById('status-txt').textContent = 'Live · ' + new Date().toLocaleTimeString();
 }
 
-setScenario('today', null);
-loadData();
+document.addEventListener('DOMContentLoaded', function() {
+  setScenario('today', null); // sets currentBg and calls updateScenario
+  loadData();
+});
 </script>
 </body>
 </html>
