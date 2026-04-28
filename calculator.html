@@ -331,8 +331,12 @@ table.bt tfoot td { padding: 10px 14px; font-weight: 700; color: var(--text); ba
       </div>
       <div class="param-group">
         <div class="param-label">Batch size <span style="color:var(--text3);font-weight:400">→ pieces per tx</span></div>
-        <div class="param-sub">Larger batches = cheaper per piece</div>
-        <input class="param-input" type="number" id="inp-batch" value="1" min="1" max="10" oninput="recalc()">
+        <div class="param-sub">Larger batches = cheaper per piece. <strong style="color:var(--orange)">K&gt;10: extrapolated. K&gt;368: stuck forever.</strong></div>
+        <input class="param-input" type="number" id="inp-batch" value="1" min="1" max="368" oninput="recalc();checkBatch()">
+      </div>
+      <div id="batch-warn" style="display:none;font-size:11px;padding:5px 10px;background:var(--orange-bg);border:1px solid var(--orange-b);border-radius:5px;color:var(--orange);margin-top:4px">
+        ⚠ Beyond ×10: no mainnet data — linear extrapolation. Beyond ×368: tx exceeds tipset budget and would be stuck forever.
+      </div>
       </div>
       <div class="param-group">
         <div class="param-label">Pieces to remove <span style="color:var(--text3);font-weight:400">→ removePieces cost</span></div>
@@ -657,7 +661,16 @@ function recalc() {
   // Gas
   const ppTotalGas   = ppGasUsed * ppTxns;
   const nppTotalGas  = nppGasUsed * nppTxns;
-  const addBatchGas  = GAS ? (GAS['addPieces_' + Math.min(batch, 10)] || addGasUsed) : (140e6 + 66e6 * batch);
+  const // addPieces gas model:
+  // K≤10: use observed mainnet values from FOC Observer
+  // K>10: linear extrapolation 215M + 66M×K (unobserved — flagged)
+  // Note: 215M intercept calibrated so K=1 → 281M matches observed avg
+  let addBatchGas;
+  if (batch <= 10 && GAS && GAS['addPieces_' + batch]) {
+    addBatchGas = GAS['addPieces_' + batch]; // observed
+  } else {
+    addBatchGas = 215e6 + 66e6 * batch; // extrapolated (unobserved beyond ×10)
+  }
   const addTotalGas  = addBatchGas * addTxns;
   const remTotalGas  = nRem > 0 ? remGas(nRem) * remTxns : 0;
 
@@ -865,90 +878,113 @@ function renderBatchTable() {
   if (el) el.innerHTML = rows;
 }
 
-// ── PP model chart ────────────────────────────────────────────────────────────
+// ── PP model chart — real mainnet data ───────────────────────────────────────
+// Binned averages from 870 real mainnet datasets (FOC Observer, April 2026)
+const PP_DATA = [[1,149.9],[2,152.5],[4,158.7],[8,164.3],[16,160.6],[32,169.7],[64,172.8],[128,172.6],[256,139.8],[512,184.8],[1024,191.1],[4096,209.4],[8192,208.2],[65536,176.1],[134217728,279.1]];
+
 function drawPPChart() {
   const canvas = document.getElementById('pp-chart');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
-  const PAD = { l: 60, r: 20, t: 20, b: 40 };
+  const PAD = { l: 55, r: 20, t: 30, b: 44 };
 
-  // Data points from real mainnet (representative)
-  const pts = [
-    [1,158],[2,164],[4,170],[8,176],[16,182],[32,188],[64,194],
-    [128,200],[256,206],[512,212],[1024,218],[4096,230],[16384,242],
-    [65536,254],[262144,266],[868515,278]
-  ];
+  const xMin = 0, xMax = 27.1; // log2(139M) ≈ 27.1
+  const yMin = 120, yMax = 300;
 
-  const xMin = 0, xMax = 20; // log2 scale
-  const yMin = 140, yMax = 290; // Mgas
-
-  const toX = v => PAD.l + (Math.log2(Math.max(1,v)) - xMin) / (xMax - xMin) * (W - PAD.l - PAD.r);
+  const toX = v => PAD.l + Math.log2(Math.max(1,v)) / xMax * (W - PAD.l - PAD.r);
   const toY = v => H - PAD.b - (v - yMin) / (yMax - yMin) * (H - PAD.t - PAD.b);
 
   ctx.clearRect(0, 0, W, H);
 
-  // Grid
+  // Grid lines
   ctx.strokeStyle = '#e8eaef'; ctx.lineWidth = 1;
-  [160,180,200,220,240,260,280].forEach(y => {
+  [120,140,160,180,200,220,240,260,280,300].forEach(y => {
     ctx.beginPath(); ctx.moveTo(PAD.l, toY(y)); ctx.lineTo(W-PAD.r, toY(y)); ctx.stroke();
     ctx.fillStyle = '#9198b0'; ctx.font = '10px Inter'; ctx.textAlign = 'right';
-    ctx.fillText(y + 'M', PAD.l-5, toY(y)+4);
+    ctx.fillText(y + 'M', PAD.l-4, toY(y)+4);
   });
-  [1,4,16,64,256,1024,4096,16384,65536,262144].forEach(x => {
-    ctx.beginPath(); ctx.moveTo(toX(x), PAD.t); ctx.lineTo(toX(x), H-PAD.b); ctx.stroke();
+  [1,4,16,64,256,1024,4096,65536,1048576,16777216,134217728].forEach(x => {
+    const px = toX(x);
+    ctx.beginPath(); ctx.moveTo(px, PAD.t); ctx.lineTo(px, H-PAD.b); ctx.stroke();
     ctx.fillStyle = '#9198b0'; ctx.font = '9px Inter'; ctx.textAlign = 'center';
-    ctx.fillText(x >= 1000 ? (x/1000)+'k' : x+'', toX(x), H-PAD.b+14);
+    const lbl = x >= 1e6 ? (x/1e6).toFixed(0)+'M' : x >= 1000 ? (x/1000)+'k' : x+'';
+    ctx.fillText(lbl, px, H-PAD.b+13);
   });
 
-  // Model line
-  ctx.strokeStyle = '#3b6ff5'; ctx.lineWidth = 2;
+  // MAE band (±4.8M from model)
+  ctx.fillStyle = 'rgba(59,111,245,0.07)';
   ctx.beginPath();
-  for (let x = 1; x <= 1000000; x *= 1.1) {
-    const y = 158.67 + 8.485 * Math.log2(x);
-    const px = toX(x), py = toY(y);
-    x === 1 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+  let first = true;
+  for (let x = 1; x <= 200000000; x *= 1.15) {
+    const y = 158.67 + 8.485 * Math.log2(x) + 14.4; // ±3×MAE
+    first ? ctx.moveTo(toX(x), toY(y)) : ctx.lineTo(toX(x), toY(y));
+    first = false;
   }
-  ctx.stroke();
-
-  // 99% confidence band (±2×MAE ≈ ±9.6M)
-  ctx.fillStyle = 'rgba(59,111,245,0.08)';
-  ctx.beginPath();
-  for (let x = 1; x <= 1000000; x *= 1.1) {
-    const y = 158.67 + 8.485 * Math.log2(x) + 9.6;
-    ctx.lineTo(toX(x), toY(y));
-  }
-  for (let x = 1000000; x >= 1; x /= 1.1) {
-    const y = 158.67 + 8.485 * Math.log2(x) - 9.6;
+  for (let x = 200000000; x >= 1; x /= 1.15) {
+    const y = 158.67 + 8.485 * Math.log2(x) - 14.4;
     ctx.lineTo(toX(x), toY(y));
   }
   ctx.closePath(); ctx.fill();
 
-  // Data points
-  ctx.fillStyle = '#1a1d2e';
-  pts.forEach(([x, y]) => {
+  // Model line
+  ctx.strokeStyle = '#3b6ff5'; ctx.lineWidth = 2;
+  ctx.beginPath();
+  first = true;
+  for (let x = 1; x <= 200000000; x *= 1.05) {
+    const y = 158.67 + 8.485 * Math.log2(x);
+    first ? ctx.moveTo(toX(x), toY(y)) : ctx.lineTo(toX(x), toY(y));
+    first = false;
+  }
+  ctx.stroke();
+
+  // Real data points (binned averages)
+  PP_DATA.forEach(([x, y]) => {
+    ctx.fillStyle = '#1a1d2e';
     ctx.beginPath();
-    ctx.arc(toX(x), toY(y), 3, 0, Math.PI*2);
+    ctx.arc(toX(x), toY(y), 4, 0, Math.PI*2);
     ctx.fill();
+    // Error bar: show model vs data difference
+    const model_y = 158.67 + 8.485 * Math.log2(Math.max(1,x));
+    const diff = Math.abs(y - model_y);
+    if (diff > 10) { // flag big outliers
+      ctx.strokeStyle = y > model_y ? '#dc2626' : '#ea580c';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(toX(x), toY(y));
+      ctx.lineTo(toX(x), toY(model_y));
+      ctx.stroke();
+    }
   });
 
-  // Labels
+  // Axis labels
   ctx.fillStyle = '#5a6075'; ctx.font = '11px Inter'; ctx.textAlign = 'center';
-  ctx.fillText('Pieces per dataset (log₂ scale)', W/2, H-4);
-  ctx.save(); ctx.translate(14, H/2); ctx.rotate(-Math.PI/2);
-  ctx.fillText('Gas used (M)', 0, 0); ctx.restore();
+  ctx.fillText('Pieces per dataset (log₂ scale)', W/2, H-2);
+  ctx.save(); ctx.translate(12, H/2); ctx.rotate(-Math.PI/2);
+  ctx.fillText('Avg gas (M)', 0, 0); ctx.restore();
 
   // Legend
-  ctx.fillStyle = '#3b6ff5'; ctx.font = '11px Inter'; ctx.textAlign = 'left';
-  ctx.fillText('— model fit (R²=0.9551)', PAD.l+8, PAD.t+14);
-  ctx.fillStyle = 'rgba(59,111,245,0.4)';
-  ctx.fillRect(PAD.l+8, PAD.t+22, 30, 6);
-  ctx.fillStyle = '#9198b0'; ctx.font = '11px Inter';
-  ctx.fillText('95% confidence band', PAD.l+44, PAD.t+29);
+  ctx.font = '11px Inter'; ctx.textAlign = 'left';
+  ctx.fillStyle = '#3b6ff5';
+  ctx.fillText('— model: 158.67M + 8.485M×log₂(N)', PAD.l+6, PAD.t+14);
+  ctx.fillStyle = 'rgba(59,111,245,0.35)';
+  ctx.fillRect(PAD.l+6, PAD.t+21, 28, 6);
+  ctx.fillStyle = '#9198b0';
+  ctx.fillText('±3×MAE band', PAD.l+40, PAD.t+28);
+  ctx.fillStyle = '#1a1d2e';
+  ctx.beginPath(); ctx.arc(PAD.l+12, PAD.t+38, 4, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#9198b0';
+  ctx.fillText('binned avg (real mainnet data)', PAD.l+22, PAD.t+42);
 }
 
 // ── CDN gas adjustment ────────────────────────────────────────────────────────
 function isCDN() { return document.getElementById('cdn-toggle')?.checked || false; }
+
+function checkBatch() {
+  const batch = parseInt(document.getElementById('inp-batch').value) || 1;
+  const warn = document.getElementById('batch-warn');
+  if (warn) warn.style.display = batch > 10 ? 'block' : 'none';
+}
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 async function init() {
