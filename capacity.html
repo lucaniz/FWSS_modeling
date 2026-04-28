@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FWSS Network Capacity</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #f8f9fc; --surface: #fff; --border: #e8eaef; --border-s: #d0d4de;
+  --text: #1a1d2e; --text2: #5a6075; --text3: #9198b0;
+  --blue: #3b6ff5; --blue-bg: #eef2ff; --blue-b: #c7d4fd;
+  --green: #16a34a; --green-bg: #f0fdf4; --green-b: #bbf7d0;
+  --red: #dc2626; --red-bg: #fef2f2; --red-b: #fecaca;
+  --orange: #ea580c; --orange-bg: #fff7ed;
+  --yellow: #d97706; --yellow-bg: #fffbeb;
+  --mono: 'JetBrains Mono', monospace; --sans: 'Inter', sans-serif;
+  --r: 10px; --shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.04);
+}
+body { font-family: var(--sans); background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+
+.header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 28px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+.header-left { display: flex; align-items: center; gap: 10px; }
+.header-icon { width: 30px; height: 30px; background: var(--green-bg); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+.header-left h1 { font-size: 14px; font-weight: 600; }
+.header-left p { font-size: 11px; color: var(--text3); margin-top: 1px; }
+.header-right { display: flex; gap: 8px; align-items: center; }
+.nav-link { font-size: 12px; color: var(--text3); text-decoration: none; padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); transition: all .15s; }
+.nav-link:hover { color: var(--blue); border-color: var(--blue-b); }
+.live-badge { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--green); background: var(--green-bg); border: 1px solid var(--green-b); border-radius: 20px; padding: 3px 10px; }
+.live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+.page { padding: 22px 28px; max-width: 1100px; margin: 0 auto; }
+.section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--text3); margin-bottom: 12px; }
+
+/* STATS */
+.stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 20px; }
+.stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 14px 16px; box-shadow: var(--shadow); }
+.stat-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--text3); margin-bottom: 5px; }
+.stat-value { font-family: var(--mono); font-size: 19px; font-weight: 700; color: var(--text); line-height: 1; letter-spacing: -.02em; }
+.stat-value.green { color: var(--green); }
+.stat-value.blue  { color: var(--blue); }
+.stat-value.orange { color: var(--orange); }
+.stat-sub { font-size: 11px; color: var(--text3); margin-top: 3px; }
+
+/* MAIN USAGE BAR */
+.usage-bar-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow-md); }
+.usage-bar-title { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
+.bar-track { height: 32px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; display: flex; position: relative; margin-bottom: 8px; }
+.bar-seg { height: 100%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: #fff; transition: width .4s ease; min-width: 0; overflow: hidden; white-space: nowrap; padding: 0 4px; }
+.bar-seg.bg   { background: #d1d5db; color: var(--text2); }
+.bar-seg.fwss { background: var(--blue); }
+.bar-seg.free { background: var(--green-bg); color: var(--green); }
+.target-line { position: absolute; right: 0; top: 0; bottom: 0; width: 2px; background: var(--red); }
+.bar-legend { display: flex; gap: 16px; font-size: 11px; color: var(--text2); }
+.leg-item { display: flex; align-items: center; gap: 5px; }
+.leg-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+/* SCENARIO TOOL */
+.scenario-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); margin-bottom: 20px; box-shadow: var(--shadow); overflow: hidden; }
+.scenario-header { padding: 16px 20px; border-bottom: 1px solid var(--border); }
+.scenario-title { font-size: 14px; font-weight: 600; }
+.scenario-sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.scenario-tabs { display: flex; gap: 6px; padding: 12px 20px; border-bottom: 1px solid var(--border); background: var(--bg); flex-wrap: wrap; }
+.tab-btn { font-size: 12px; padding: 5px 14px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); color: var(--text2); cursor: pointer; transition: all .15s; font-family: var(--sans); font-weight: 500; }
+.tab-btn:hover { border-color: var(--blue-b); color: var(--blue); }
+.tab-btn.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+.scenario-body { padding: 20px; }
+.scenario-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.sc-stat { }
+.sc-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+.sc-value { font-family: var(--mono); font-size: 20px; font-weight: 700; color: var(--text); }
+.sc-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.sc-note { font-size: 12px; color: var(--text2); margin-top: 12px; padding: 10px 14px; background: var(--bg); border-radius: 7px; border: 1px solid var(--border); line-height: 1.5; }
+
+/* GROWTH CHART */
+.two-col { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 20px; }
+.panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); box-shadow: var(--shadow); overflow: hidden; }
+.panel-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+.panel-title { font-size: 14px; font-weight: 600; }
+.panel-sub { font-size: 12px; color: var(--text3); }
+.panel-body { padding: 16px 18px; }
+.bars { display: flex; align-items: flex-end; gap: 5px; height: 100px; }
+.bw { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.bb { width: 100%; border-radius: 4px 4px 0 0; min-height: 2px; background: var(--blue); opacity: .8; transition: height .4s; }
+.bw:hover .bb { opacity: 1; }
+.bl { font-size: 9px; color: var(--text3); text-align: center; }
+.bv { font-size: 9px; color: var(--text2); font-family: var(--mono); }
+
+/* DIST TABLE */
+table.dist { width: 100%; border-collapse: collapse; font-size: 12px; }
+table.dist th { text-align: left; padding: 7px 12px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--text3); background: var(--bg); border-bottom: 1px solid var(--border); }
+table.dist td { padding: 8px 12px; border-bottom: 1px solid var(--border); color: var(--text2); font-family: var(--mono); font-size: 12px; }
+table.dist tr:last-child td { border-bottom: none; }
+
+.loading { display: flex; align-items: center; gap: 6px; color: var(--text3); font-size: 12px; padding: 20px; }
+.spinner { width: 14px; height: 14px; border: 2px solid var(--border); border-top-color: var(--blue); border-radius: 50%; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="header-icon">📡</div>
+    <div>
+      <h1>FWSS Network Capacity</h1>
+      <p>How much of Filecoin's gas budget does FWSS use? · daily gas target: 70,560 Ggas</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="live-badge"><div class="live-dot"></div><span id="status-txt">Loading...</span></div>
+    <a href="calculator.html" class="nav-link">⚡ Calculator</a>
+    <a href="extreme_modeling.html" class="nav-link">🔴 Extreme</a>
+    <a href="index.html" class="nav-link">← Index</a>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-label">Active datasets</div>
+      <div class="stat-value green" id="s-ds">—</div>
+      <div class="stat-sub">not terminated</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Daily FWSS gas</div>
+      <div class="stat-value blue" id="s-daily-gas">—</div>
+      <div class="stat-sub" id="s-daily-pct">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Daily target</div>
+      <div class="stat-value">70,560</div>
+      <div class="stat-sub">Ggas/day · 5B × 4.9 × 2880</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Headroom (today)</div>
+      <div class="stat-value" id="s-headroom">—</div>
+      <div class="stat-sub">Ggas available for FWSS</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Max datasets (today)</div>
+      <div class="stat-value orange" id="s-maxds">—</div>
+      <div class="stat-sub">at current non-FWSS load</div>
+    </div>
+  </div>
+
+  <!-- USAGE BAR -->
+  <div class="usage-bar-card">
+    <div class="usage-bar-title">Daily gas usage vs target</div>
+    <div class="bar-track">
+      <div class="bar-seg bg" id="bar-bg" style="width:21.7%">Other</div>
+      <div class="bar-seg fwss" id="bar-fwss" style="width:0.13%">FWSS</div>
+      <div class="bar-seg free" id="bar-free" style="width:78.17%">Headroom</div>
+    </div>
+    <div class="bar-legend">
+      <div class="leg-item"><div class="leg-dot" style="background:#d1d5db"></div>Non-FWSS (~15,327 Ggas today)</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--blue)"></div>FWSS (<span id="bar-fwss-label">—</span>)</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--green-bg);border:1px solid var(--green-b)"></div>Headroom</div>
+    </div>
+  </div>
+
+  <!-- SCENARIO TOOL -->
+  <div class="scenario-card">
+    <div class="scenario-header">
+      <div class="scenario-title">Network scenario</div>
+      <div class="scenario-sub">How much FWSS headroom remains at different network loads?</div>
+    </div>
+    <div class="scenario-tabs">
+      <button class="tab-btn active" onclick="setScenario('today',this)">Today (Apr 2026)</button>
+      <button class="tab-btn" onclick="setScenario('low',this)">Low (2025 p25)</button>
+      <button class="tab-btn" onclick="setScenario('medium',this)">Medium (hist. median)</button>
+      <button class="tab-btn" onclick="setScenario('high',this)">High (Dec 2024)</button>
+      <button class="tab-btn" onclick="setScenario('peak',this)">Peak (Dec 12, 2024)</button>
+    </div>
+    <div class="scenario-body">
+      <div class="scenario-grid">
+        <div class="sc-stat">
+          <div class="sc-label">Non-FWSS gas</div>
+          <div class="sc-value" id="sc-bg">—</div>
+          <div class="sc-sub">Ggas/day</div>
+        </div>
+        <div class="sc-stat">
+          <div class="sc-label">FWSS headroom</div>
+          <div class="sc-value" id="sc-hw">—</div>
+          <div class="sc-sub">Ggas/day remaining</div>
+        </div>
+        <div class="sc-stat">
+          <div class="sc-label">Max FWSS datasets</div>
+          <div class="sc-value" id="sc-max">—</div>
+          <div class="sc-sub">at weighted avg gas/dataset</div>
+        </div>
+      </div>
+      <div class="sc-note" id="sc-note">—</div>
+    </div>
+  </div>
+
+  <!-- GROWTH + DIST -->
+  <div class="two-col">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Dataset size distribution</span>
+        <span class="panel-sub">by piece count · mainnet</span>
+      </div>
+      <div class="panel-body">
+        <table class="dist">
+          <thead><tr><th>Size bucket</th><th># datasets</th><th>Avg pieces</th><th>Gas/day</th><th>% of target</th></tr></thead>
+          <tbody>
+            <tr><td>1 piece</td><td>225</td><td>1</td><td>283M</td><td>0.0004%</td></tr>
+            <tr><td>2–10 pieces</td><td>223</td><td>4</td><td>300M</td><td>0.0004%</td></tr>
+            <tr><td>11–100 pieces</td><td>155</td><td>61</td><td>333M</td><td>0.0005%</td></tr>
+            <tr><td>101–1k pieces</td><td>243</td><td>229</td><td>349M</td><td>0.0005%</td></tr>
+            <tr><td>1k–10k pieces</td><td>30</td><td>1,744</td><td>374M</td><td>0.0005%</td></tr>
+            <tr><td>&gt;10k pieces</td><td>2</td><td>508,705</td><td>444M</td><td>0.0006%</td></tr>
+          </tbody>
+        </table>
+        <div style="font-size:11px;color:var(--text3);margin-top:10px">
+          Weighted average: ~323M gas/dataset/day · 475 active datasets = ~153 Ggas/day total
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Weekly growth</span>
+        <span class="panel-sub">new datasets/week</span>
+      </div>
+      <div class="panel-body">
+        <div class="bars" id="growth-bars">
+          <div class="loading"><div class="spinner"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const FOC = 'https://foc-observer.va.gg';
+const GAS_TARGET_GGAS = 70560;
+const NON_FWSS_TODAY  = 15327; // Ggas
+const AVG_GAS_PER_DS  = 323;   // Ggas/day weighted avg
+
+const SCENARIOS = {
+  today:  { bg: 15327, note: 'Current live network load — Filecoin is near its all-time low utilisation. Base fee at protocol floor (100 attoFIL).' },
+  low:    { bg: 23832, note: '25th percentile of 2025–2026 activity. Network lightly loaded.' },
+  medium: { bg: 45202, note: 'Historical median gas usage (2022–2026). A normal busy period for Filecoin L1.' },
+  high:   { bg: 47645, note: 'December 2024 average — peak sector onboarding. Base fee was elevated, network near 68% of target.' },
+  peak:   { bg: 51381, note: 'Single-day peak on December 12, 2024. Network at 72.8% of gas target — highest in recent history.' },
+};
+
+function setScenario(key, btn) {
+  const sc = SCENARIOS[key];
+  const hw = GAS_TARGET_GGAS - sc.bg;
+  const maxDs = Math.floor(hw * 1e9 / (AVG_GAS_PER_DS * 1e6));
+
+  document.getElementById('sc-bg').textContent   = sc.bg.toLocaleString();
+  document.getElementById('sc-hw').textContent   = hw.toLocaleString();
+  document.getElementById('sc-max').textContent  = maxDs.toLocaleString();
+  document.getElementById('sc-note').textContent = sc.note;
+
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+
+async function loadData() {
+  try {
+    // Active datasets
+    const r = await fetch(FOC + '/sql', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sql: `SELECT COUNT(DISTINCT f.data_set_id) as ds
+              FROM fwss_data_set_created f
+              LEFT JOIN fwss_service_terminated t ON t.data_set_id=f.data_set_id
+              WHERE t.data_set_id IS NULL`,
+        network: 'mainnet'
+      })
+    });
+    const d = await r.json();
+    const activeDs = parseInt(d.rows[0]?.ds || 475);
+    const dailyGasGgas = activeDs * AVG_GAS_PER_DS / 1e3; // Ggas
+    const pct = (dailyGasGgas / GAS_TARGET_GGAS * 100).toFixed(3);
+    const hwGgas = GAS_TARGET_GGAS - NON_FWSS_TODAY - dailyGasGgas;
+    const maxDs = Math.floor((GAS_TARGET_GGAS - NON_FWSS_TODAY) * 1e9 / (AVG_GAS_PER_DS * 1e6));
+
+    document.getElementById('s-ds').textContent         = activeDs.toLocaleString();
+    document.getElementById('s-daily-gas').textContent  = dailyGasGgas.toFixed(1) + ' Ggas';
+    document.getElementById('s-daily-pct').textContent  = pct + '% of daily target';
+    document.getElementById('s-headroom').textContent   = (GAS_TARGET_GGAS - NON_FWSS_TODAY).toLocaleString() + ' Ggas';
+    document.getElementById('s-maxds').textContent      = maxDs.toLocaleString();
+    document.getElementById('bar-fwss-label').textContent = pct + '% of target';
+
+    // Bar
+    const bgPct   = (NON_FWSS_TODAY / GAS_TARGET_GGAS * 100).toFixed(2);
+    const fwssPct = (dailyGasGgas / GAS_TARGET_GGAS * 100).toFixed(2);
+    const freePct = (100 - parseFloat(bgPct) - parseFloat(fwssPct)).toFixed(2);
+    document.getElementById('bar-bg').style.width   = bgPct + '%';
+    document.getElementById('bar-fwss').style.width = Math.max(0.3, parseFloat(fwssPct)) + '%';
+    document.getElementById('bar-free').style.width = freePct + '%';
+  } catch(e) { console.error(e); }
+
+  // Growth chart
+  try {
+    const r2 = await fetch(FOC + '/sql', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sql: `SELECT DATE_TRUNC('week', TO_TIMESTAMP(timestamp)) as week, COUNT(DISTINCT data_set_id) as n
+              FROM fwss_data_set_created GROUP BY week ORDER BY week DESC LIMIT 8`,
+        network: 'mainnet'
+      })
+    });
+    const d2 = await r2.json();
+    const rows = [...d2.rows].reverse();
+    const maxN = Math.max(...rows.map(r => parseInt(r.n)));
+    document.getElementById('growth-bars').innerHTML = rows.map(r => {
+      const n = parseInt(r.n);
+      const h = Math.max(4, n/maxN * 88);
+      const dt = new Date(r.week);
+      const lbl = (dt.getMonth()+1) + '/' + dt.getDate();
+      return `<div class="bw">
+        <div class="bv">${n}</div>
+        <div class="bb" style="height:${h}px"></div>
+        <div class="bl">${lbl}</div>
+      </div>`;
+    }).join('');
+  } catch(e) {}
+
+  document.getElementById('status-txt').textContent = 'Live · ' + new Date().toLocaleTimeString();
+}
+
+setScenario('today', null);
+loadData();
+</script>
+</body>
+</html>
