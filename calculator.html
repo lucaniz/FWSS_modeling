@@ -928,7 +928,10 @@ async function init() {
     const el=document.getElementById('methodology');
     if(el){
       el.open=true;
-      setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),400);
+      // Wait for page to fully render before scrolling
+      setTimeout(()=>{
+        el.scrollIntoView({behavior:'smooth',block:'start'});
+      }, 800);
     }
   }
   document.getElementById('status-txt').textContent = 'Live · '+new Date().toLocaleTimeString();
