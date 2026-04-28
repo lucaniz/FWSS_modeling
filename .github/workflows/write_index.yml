@@ -1,0 +1,27 @@
+name: Write index.html
+on:
+  workflow_dispatch:
+jobs:
+  write:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Write index.html
+        run: |
+          python3 << 'PYEOF'
+          import base64, gzip
+          b64 = "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"
+          data = gzip.decompress(base64.b64decode(b64))
+          with open('index.html', 'wb') as f:
+              f.write(data)
+          print(f"Written {len(data)} bytes")
+          PYEOF
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -f index.html
+          git commit --allow-empty -m "feat: landing page"
+          git push
