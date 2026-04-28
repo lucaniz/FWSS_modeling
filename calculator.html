@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FWSS Gas & Cost Calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #f8f9fc; --surface: #fff; --border: #e8eaef; --border-s: #d0d4de;
+  --text: #1a1d2e; --text2: #5a6075; --text3: #9198b0;
+  --blue: #3b6ff5; --blue-bg: #eef2ff; --blue-b: #c7d4fd;
+  --green: #16a34a; --green-bg: #f0fdf4; --green-b: #bbf7d0;
+  --red: #dc2626; --red-bg: #fef2f2; --red-b: #fecaca;
+  --orange: #ea580c; --orange-bg: #fff7ed;
+  --yellow: #d97706; --yellow-bg: #fffbeb;
+  --purple: #7c3aed; --purple-bg: #f5f3ff;
+  --mono: 'JetBrains Mono', monospace; --sans: 'Inter', sans-serif;
+  --r: 10px; --shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.04);
+}
+body { font-family: var(--sans); background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+
+/* HEADER */
+.header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 28px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+.header-left { display: flex; align-items: center; gap: 10px; }
+.header-icon { width: 30px; height: 30px; background: var(--blue-bg); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+.header-left h1 { font-size: 14px; font-weight: 600; }
+.header-left p { font-size: 11px; color: var(--text3); margin-top: 1px; }
+.header-right { display: flex; gap: 8px; align-items: center; }
+.nav-link { font-size: 12px; color: var(--text3); text-decoration: none; padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); transition: all .15s; }
+.nav-link:hover { color: var(--blue); border-color: var(--blue-b); }
+.live-badge { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--green); background: var(--green-bg); border: 1px solid var(--green-b); border-radius: 20px; padding: 3px 10px; }
+.live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+/* PAGE */
+.page { padding: 22px 28px; max-width: 1200px; margin: 0 auto; }
+.section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--text3); margin-bottom: 12px; }
+
+/* GAS FEE PANEL */
+.gas-fee-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); box-shadow: var(--shadow); padding: 20px; margin-bottom: 20px; }
+.gas-fee-grid { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 16px; align-items: end; }
+.gas-input-group { display: flex; flex-direction: column; gap: 4px; }
+.gas-input-label { font-size: 12px; font-weight: 600; color: var(--text2); }
+.gas-input-sub { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
+.gas-input { border: 1px solid var(--border-s); border-radius: 7px; padding: 8px 12px; font-family: var(--mono); font-size: 13px; color: var(--text); background: var(--bg); width: 100%; transition: border-color .15s; }
+.gas-input:focus { outline: none; border-color: var(--blue); background: var(--surface); }
+.egp-display { background: var(--blue-bg); border: 1px solid var(--blue-b); border-radius: 7px; padding: 10px 14px; }
+.egp-label { font-size: 11px; color: var(--blue); font-weight: 600; margin-bottom: 2px; }
+.egp-value { font-family: var(--mono); font-size: 18px; font-weight: 700; color: var(--blue); }
+.egp-sub { font-size: 10px; color: var(--text3); margin-top: 2px; }
+.formula-note { background: var(--yellow-bg); border: 1px solid #fde68a; border-radius: 7px; padding: 10px 14px; font-size: 12px; color: var(--yellow); margin-top: 12px; line-height: 1.5; }
+.formula-note code { background: rgba(217,119,6,.1); padding: 1px 5px; border-radius: 3px; font-family: var(--mono); font-size: 11px; }
+.presets { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.preset-btn { font-size: 11px; padding: 3px 10px; border-radius: 5px; border: 1px solid var(--border); background: var(--surface); color: var(--text2); cursor: pointer; transition: all .15s; font-family: var(--sans); }
+.preset-btn:hover { border-color: var(--blue); color: var(--blue); }
+.preset-btn.active { background: var(--blue-bg); border-color: var(--blue-b); color: var(--blue); font-weight: 600; }
+
+/* GAS REFERENCE GRID */
+.gas-ref-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin-bottom: 20px; }
+.gas-ref-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 14px; box-shadow: var(--shadow); }
+.grc-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--text3); margin-bottom: 6px; }
+.grc-gas { font-family: var(--mono); font-size: 15px; font-weight: 700; color: var(--text); line-height: 1; }
+.grc-fil { font-family: var(--mono); font-size: 11px; color: var(--blue); margin-top: 3px; }
+.grc-usd { font-size: 11px; color: var(--text3); margin-top: 1px; }
+
+/* FIL PRICE */
+.price-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.price-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 16px; box-shadow: var(--shadow); }
+.price-card .pc-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--text3); margin-bottom: 8px; }
+.price-val { display: flex; align-items: center; gap: 8px; }
+.price-val input { border: 1px solid var(--border-s); border-radius: 6px; padding: 6px 10px; font-family: var(--mono); font-size: 13px; width: 120px; background: var(--bg); color: var(--text); }
+.price-val input:focus { outline: none; border-color: var(--blue); background: var(--surface); }
+.price-val .unit { font-size: 12px; color: var(--text3); }
+.price-live-badge { font-size: 11px; color: var(--green); background: var(--green-bg); border: 1px solid var(--green-b); border-radius: 5px; padding: 2px 8px; }
+
+/* USAGE PARAMS */
+.usage-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow); }
+.usage-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.param-group { display: flex; flex-direction: column; gap: 6px; }
+.param-label { font-size: 12px; font-weight: 600; color: var(--text2); }
+.param-sub { font-size: 11px; color: var(--text3); }
+.param-input { border: 1px solid var(--border-s); border-radius: 6px; padding: 7px 10px; font-family: var(--mono); font-size: 13px; color: var(--text); background: var(--bg); width: 100%; }
+.param-input:focus { outline: none; border-color: var(--blue); background: var(--surface); }
+.param-slider { width: 100%; accent-color: var(--blue); margin-top: 2px; }
+
+/* COST BREAKDOWN */
+.breakdown-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); box-shadow: var(--shadow-md); margin-bottom: 20px; overflow: hidden; }
+.breakdown-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.breakdown-title { font-size: 14px; font-weight: 600; }
+.breakdown-sub { font-size: 12px; color: var(--text3); }
+table.bt { width: 100%; border-collapse: collapse; font-size: 13px; }
+table.bt thead th { text-align: left; padding: 9px 14px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--text3); background: var(--bg); border-bottom: 1px solid var(--border); }
+table.bt thead th.tr { text-align: right; }
+table.bt tbody td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--text2); }
+table.bt tbody tr:last-child td { border-bottom: none; }
+table.bt tbody tr:hover td { background: var(--bg); }
+table.bt tfoot td { padding: 10px 14px; font-weight: 700; color: var(--text); background: var(--bg); border-top: 2px solid var(--border-s); }
+.mono { font-family: var(--mono); font-size: 12px; }
+.tr { text-align: right; }
+
+/* COST DETAIL — the new section showing full cost breakdown per operation */
+.cost-detail { padding: 16px 20px; border-top: 1px solid var(--border); background: var(--bg); }
+.cost-detail-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--text3); margin-bottom: 10px; }
+.cost-detail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+.cdc { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
+.cdc-op { font-size: 11px; font-weight: 700; color: var(--text); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .04em; }
+.cdc-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; border-bottom: 1px solid var(--border); font-size: 11px; }
+.cdc-row:last-child { border-bottom: none; padding-top: 6px; margin-top: 2px; font-weight: 700; }
+.cdc-key { color: var(--text3); }
+.cdc-val { font-family: var(--mono); color: var(--text); }
+.cdc-val.burn { color: var(--red); }
+.cdc-val.tip { color: var(--orange); }
+.cdc-val.total { color: var(--blue); font-size: 12px; }
+
+/* SUMMARY */
+.summary-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+.sum-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 16px; box-shadow: var(--shadow); }
+.sum-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; color: var(--text3); margin-bottom: 5px; }
+.sum-value { font-family: var(--mono); font-size: 20px; font-weight: 700; color: var(--text); line-height: 1; letter-spacing: -.02em; }
+.sum-sub { font-size: 11px; color: var(--text3); margin-top: 4px; }
+
+/* TOOLTIP / INFO */
+.info-box { background: var(--blue-bg); border: 1px solid var(--blue-b); border-radius: 8px; padding: 12px 16px; font-size: 12px; color: var(--blue); line-height: 1.6; margin-bottom: 20px; }
+.info-box code { background: rgba(59,111,245,.1); padding: 1px 5px; border-radius: 3px; font-family: var(--mono); font-size: 11px; }
+
+/* LOADING */
+.loading { display: flex; align-items: center; gap: 6px; color: var(--text3); font-size: 12px; }
+.spinner { width: 14px; height: 14px; border: 2px solid var(--border); border-top-color: var(--blue); border-radius: 50%; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="header-icon">⚡</div>
+    <div>
+      <h1>FWSS Gas & Cost Calculator</h1>
+      <p>Real costs for every FWSS operation · Filecoin mainnet · live data</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="live-badge"><div class="live-dot"></div><span id="status-txt">Loading...</span></div>
+    <a href="capacity.html" class="nav-link">📡 Capacity</a>
+    <a href="extreme_modeling.html" class="nav-link">⚡ Extreme</a>
+    <a href="index.html" class="nav-link">← Index</a>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- GAS FEE MODEL -->
+  <div class="section-title">Gas fee parameters</div>
+  <div class="gas-fee-panel">
+    <div class="gas-fee-grid">
+      <div class="gas-input-group">
+        <div class="gas-input-label">Base fee <span style="font-weight:400;color:var(--text3)">(attoFIL/gas)</span></div>
+        <div class="gas-input-sub">Set by the network. Today ≈ 100.</div>
+        <input class="gas-input" type="number" id="inp-basefee" value="100" min="100" step="100" oninput="onGasFeeChange()">
+        <div class="presets" id="bf-presets">
+          <button class="preset-btn active" onclick="setPreset('bf',100,this)">Today (~100)</button>
+          <button class="preset-btn" onclick="setPreset('bf',500,this)">Low congestion</button>
+          <button class="preset-btn" onclick="setPreset('bf',5000,this)">Medium</button>
+          <button class="preset-btn" onclick="setPreset('bf',50000,this)">High spike</button>
+        </div>
+      </div>
+      <div class="gas-input-group">
+        <div class="gas-input-label">Gas premium <span style="font-weight:400;color:var(--text3)">(attoFIL/gas)</span></div>
+        <div class="gas-input-sub">Tip to miner. Min ~100,000. Avg 30d: 252,105.</div>
+        <input class="gas-input" type="number" id="inp-premium" value="252105" min="100000" step="10000" oninput="onGasFeeChange()">
+        <div class="presets" id="prem-presets">
+          <button class="preset-btn active" onclick="setPreset('prem',252105,this)">30d avg</button>
+          <button class="preset-btn" onclick="setPreset('prem',100000,this)">Min (100k)</button>
+          <button class="preset-btn" onclick="setPreset('prem',500000,this)">High</button>
+        </div>
+      </div>
+      <div class="gas-input-group">
+        <div class="gas-input-label">Gas fee cap <span style="font-weight:400;color:var(--text3)">(attoFIL/gas)</span></div>
+        <div class="gas-input-sub">Max sender pays. Must be ≥ BaseFee + Premium.</div>
+        <input class="gas-input" type="number" id="inp-feecap" value="300000" min="100000" step="10000" oninput="onGasFeeChange()">
+        <div class="presets" id="fc-presets">
+          <button class="preset-btn active" onclick="setPreset('fc',300000,this)">Typical</button>
+          <button class="preset-btn" onclick="setPreset('fc',600000,this)">High</button>
+          <button class="preset-btn" onclick="setPreset('fc',0,this)">= BF+Prem</button>
+        </div>
+      </div>
+      <div>
+        <div class="gas-input-label" style="margin-bottom:6px">Effective gas price</div>
+        <div class="egp-display">
+          <div class="egp-label">= BaseFee + min(Premium, FeeCap − BaseFee)</div>
+          <div class="egp-value" id="egp-val">—</div>
+          <div class="egp-sub" id="egp-sub">attoFIL/gas</div>
+        </div>
+      </div>
+    </div>
+    <div class="formula-note">
+      <strong>Formula (from Lotus source):</strong>
+      <code>effective_gas_price = BaseFee + min(GasPremium, GasFeeCap − BaseFee)</code><br>
+      Total tx cost = <code>GasUsed × BaseFee</code> (burned) + <code>GasUsed × effective_premium</code> (to miner) + overestimation burn on unused gas above 10% tolerance.<br>
+      Today (pre FIP-0115) with BaseFee ≈ 100 attoFIL, the miner premium dominates (~99.9% of the fee is burned as burn+tip, but mostly tip). Under FIP-0115 (Draft), BaseFee would rise to ~90% of EGP — burn dominates, miners earn less tip. Use the toggle below to model both scenarios.
+    </div>
+
+    <!-- FIP-0115 TOGGLE -->
+    <div style="display:flex;align-items:center;gap:12px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+      <span style="font-size:12px;font-weight:600;color:var(--text2)">Gas market regime:</span>
+      <div style="display:flex;gap:6px">
+        <button class="preset-btn active" id="fip-pre" onclick="setFIPRegime('pre',this)">
+          Pre FIP-0115 <span style="font-weight:400;color:var(--text3)">(today — premium dominates)</span>
+        </button>
+        <button class="preset-btn" id="fip-post" onclick="setFIPRegime('post',this)">
+          Post FIP-0115 <span style="font-weight:400;color:var(--text3)">(draft — BaseFee rises)</span>
+        </button>
+      </div>
+      <div style="font-size:11px;color:var(--text3)" id="fip-note">BaseFee ≈ 0.04% of effective gas price today</div>
+    </div>
+  </div>
+
+  <!-- FIL PRICE -->
+  <div class="price-row">
+    <div class="price-card">
+      <div class="pc-label">FIL price (USD)</div>
+      <div class="price-val">
+        <span>$</span>
+        <input type="number" id="inp-fil" value="0.92" min="0.01" step="0.01" oninput="recalc()">
+        <span class="unit">/ FIL</span>
+        <span class="price-live-badge" id="fil-live-badge">live</span>
+      </div>
+    </div>
+    <div class="price-card">
+      <div class="pc-label">Observation period</div>
+      <div class="price-val">
+        <input type="number" id="inp-days" value="30" min="1" max="365" step="1" oninput="recalc()">
+        <span class="unit">days</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAS REFERENCE -->
+  <div class="section-title">Gas per operation (live from FOC Observer)</div>
+  <div class="gas-ref-grid" id="gas-ref-grid">
+    <div class="loading"><div class="spinner"></div>Loading...</div>
+  </div>
+
+  <!-- USAGE PARAMETERS -->
+  <div class="section-title">Usage parameters <span style="font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0">— define your volume to compute total costs below</span></div>
+  <div class="usage-panel">
+    <div class="usage-grid">
+      <div class="param-group">
+        <div class="param-label">Datasets <span style="color:var(--text3);font-weight:400">→ proving costs</span></div>
+        <div class="param-sub">Number of active FWSS datasets</div>
+        <input class="param-input" type="number" id="inp-ds" value="10" min="1" max="100000" oninput="recalc()">
+      </div>
+      <div class="param-group">
+        <div class="param-label">Pieces per dataset <span style="color:var(--text3);font-weight:400">→ provePossession gas</span></div>
+        <div class="param-sub">Drives gas via log₂(N) model</div>
+        <input class="param-input" type="number" id="inp-pieces" value="100" min="1" max="1000000" oninput="recalc()">
+        <input class="param-slider" type="range" id="sl-pieces" min="0" max="20" value="6" step="0.1" oninput="syncSlider()">
+        <div style="font-size:10px;color:var(--text3)" id="pieces-note">log₂ scale</div>
+      </div>
+      <div class="param-group">
+        <div class="param-label">Pieces to add <span style="color:var(--text3);font-weight:400">→ addPieces cost</span></div>
+        <div class="param-sub">Total uploads during period</div>
+        <input class="param-input" type="number" id="inp-add" value="1000" min="0" oninput="recalc()">
+      </div>
+      <div class="param-group">
+        <div class="param-label">Batch size <span style="color:var(--text3);font-weight:400">→ pieces per tx</span></div>
+        <div class="param-sub">Larger batches = cheaper per piece</div>
+        <input class="param-input" type="number" id="inp-batch" value="1" min="1" max="10" oninput="recalc()">
+      </div>
+      <div class="param-group">
+        <div class="param-label">Pieces to remove <span style="color:var(--text3);font-weight:400">→ removePieces cost</span></div>
+        <div class="param-sub">Removals per observation period</div>
+        <input class="param-input" type="number" id="inp-rem" value="0" min="0" oninput="recalc()">
+      </div>
+      <div class="param-group">
+        <div class="param-label">SP settlement ratio <span style="color:var(--text3);font-weight:400">→ NPP cost</span></div>
+        <div class="param-sub">Fraction of datasets settled per NPP</div>
+        <input class="param-input" type="number" id="inp-settle" value="1" min="0" max="1" step="0.1" oninput="recalc()">
+      </div>
+    </div>
+  </div>
+
+  <!-- COST BREAKDOWN TABLE -->
+  <div class="breakdown-panel">
+    <div class="breakdown-header">
+      <div class="breakdown-title">Cost breakdown</div>
+      <div class="breakdown-sub" id="breakdown-sub">—</div>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="bt">
+        <thead>
+          <tr>
+            <th style="width:25%">Operation</th>
+            <th class="tr">Txns</th>
+            <th class="tr">Gas/tx</th>
+            <th class="tr">Total gas</th>
+            <th class="tr">FIL cost</th>
+            <th class="tr">USD</th>
+          </tr>
+        </thead>
+        <tbody id="cost-tbody"></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3" style="font-size:12px;color:var(--text3)">Total</td>
+            <td class="tr mono" id="tot-gas">—</td>
+            <td class="tr mono" id="tot-fil">—</td>
+            <td class="tr mono" id="tot-usd">—</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <!-- COST DETAIL per operation -->
+    <div class="cost-detail">
+      <div class="cost-detail-title">Transaction cost breakdown per operation (burn + miner tip)</div>
+      <div class="cost-detail-grid" id="cost-detail-grid"></div>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="summary-row">
+    <div class="sum-card">
+      <div class="sum-label">Daily gas (all datasets)</div>
+      <div class="sum-value" id="sum-daily-gas">—</div>
+      <div class="sum-sub" id="sum-daily-pct">—</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-label">Daily cost (FIL)</div>
+      <div class="sum-value" id="sum-daily-fil">—</div>
+      <div class="sum-sub" id="sum-daily-usd">—</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-label">Per dataset / month</div>
+      <div class="sum-value" id="sum-per-ds">—</div>
+      <div class="sum-sub">proving only</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-label">Cost per piece added</div>
+      <div class="sum-value" id="sum-per-piece">—</div>
+      <div class="sum-sub" id="sum-per-piece-sub">—</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── Constants ─────────────────────────────────────────────────────────────────
+const MODEL_ALPHA = 158.67e6;
+const MODEL_BETA  = 8.485e6;
+const NPP_GAS     = 124e6;
+const GAS_TARGET  = 70560e9; // Ggas/day in gas units
+
+// REM_OBS: observed mainnet values for removePieces
+const REM_OBS = {1:407e6,2:601e6,3:781e6,4:950e6,5:1010e6,9:840e6,20:1754e6,50:5900e6,80:9530e6,125:8075e6,144:8600e6};
+const REM_EXP = 0.614;
+
+// ── FIP-0115 regime presets ──────────────────────────────────────────────────────
+// Pre FIP-0115: BaseFee ≈ 100, GasPremium ≈ 252,000, GasFeeCap ≈ 300,000
+// Post FIP-0115 (estimated): BaseFee converges upward, premium shrinks
+// The FIP targets Premium_20 / BaseFee = 1/8, so at equilibrium:
+//   if total_egp stays similar (~252,000), then BaseFee ~ 252,000 / (1 + 8) * 8 ~ 224,000
+//   and Premium ~ 28,000. This is a rough estimate — actual values depend on market.
+// Status: DRAFT (created 2026-02-13) — not yet active on mainnet.
+const FIP_REGIMES = {
+  pre: {
+    basefee: 100,
+    premium: 252105,
+    feecap:  300000,
+    note: 'Pre FIP-0115 (today): BaseFee ≈ 100 attoFIL, GasPremium dominates (99.9% of fee). BaseFee is only 0.04% of effective gas price.',
+  },
+  post: {
+    basefee: 200000,
+    premium: 28000,
+    feecap:  250000,
+    note: 'Post FIP-0115 (estimated): at equilibrium Premium₂₀ / BaseFee = 1/8. If total EGP stays ~250k, BaseFee ~ 222k and Premium ~ 28k. BaseFee becomes ~89% of the fee — burn dominates over miner tip. NOTE: FIP-0115 is still in Draft status.',
+  },
+};
+
+function setFIPRegime(key, btn) {
+  const regime = FIP_REGIMES[key];
+  document.getElementById('inp-basefee').value = regime.basefee;
+  document.getElementById('inp-premium').value = regime.premium;
+  document.getElementById('inp-feecap').value  = regime.feecap;
+  document.getElementById('fip-pre').classList.remove('active');
+  document.getElementById('fip-post').classList.remove('active');
+  if (btn) btn.classList.add('active');
+  document.getElementById('fip-note').textContent = regime.note;
+  // clear other presets
+  document.querySelectorAll('#bf-presets .preset-btn, #prem-presets .preset-btn, #fc-presets .preset-btn')
+    .forEach(b => b.classList.remove('active'));
+  onGasFeeChange();
+}
+
+// ── Gas fee model ─────────────────────────────────────────────────────────────
+// effective_gas_price = BaseFee + min(GasPremium, GasFeeCap - BaseFee)
+// From: lotus/chain/types/message.go EffectiveGasPremium()
+function effectiveGasPrice(bf, prem, fc) {
+  const effectivePremium = Math.min(prem, Math.max(0, fc - bf));
+  return bf + effectivePremium;
+}
+
+// Total tx cost in FIL = gas_used * egp / 1e18
+// (This approximates the full cost: base_burn + miner_tip + overestimation_burn)
+// The overestimation burn is typically small (<5%) and we flag it.
+function gasCostFIL(gasUsed, egp) {
+  return gasUsed * egp / 1e18;
+}
+
+// Burn component = gasUsed * baseFee / 1e18
+function burnFIL(gasUsed, bf) {
+  return gasUsed * bf / 1e18;
+}
+
+// Miner tip = gasUsed * effectivePremium / 1e18 (approx, using gasUsed not gasLimit)
+function tipFIL(gasUsed, bf, prem, fc) {
+  const effPrem = Math.min(prem, Math.max(0, fc - bf));
+  return gasUsed * effPrem / 1e18;
+}
+
+// ── Gas models ────────────────────────────────────────────────────────────────
+function ppGas(pieces) {
+  return MODEL_ALPHA + MODEL_BETA * Math.log2(Math.max(1, pieces));
+}
+
+function remGas(K) {
+  K = Math.max(1, Math.round(K));
+  if (REM_OBS[K] !== undefined) return REM_OBS[K];
+  if (K > 144) return 407e6 * Math.pow(K, REM_EXP);
+  const keys = Object.keys(REM_OBS).map(Number).sort((a,b) => a-b);
+  let lo = keys[0], hi = keys[keys.length-1];
+  for (let i = 0; i < keys.length-1; i++) {
+    if (keys[i] <= K && keys[i+1] >= K) { lo = keys[i]; hi = keys[i+1]; break; }
+  }
+  const t = (K - lo) / (hi - lo);
+  return REM_OBS[lo] + t * (REM_OBS[hi] - REM_OBS[lo]);
+}
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let GAS = null; // live gas values from FOC Observer
+let filPrice = 0.92;
+let egp = 252205; // effective gas price
+
+// ── Presets ───────────────────────────────────────────────────────────────────
+const PRESETS_BF   = { 'Today (~100)': 100, 'Low congestion': 500, 'Medium': 5000, 'High spike': 50000 };
+const PRESETS_PREM = { '30d avg': 252105, 'Min (100k)': 100000, 'High': 500000 };
+const PRESETS_FC   = { 'Typical': 300000, 'High': 600000 };
+
+function setPreset(type, val, btn) {
+  if (type === 'bf') {
+    document.getElementById('inp-basefee').value = val;
+    document.querySelectorAll('#bf-presets .preset-btn').forEach(b => b.classList.remove('active'));
+  } else if (type === 'prem') {
+    document.getElementById('inp-premium').value = val;
+    document.querySelectorAll('#prem-presets .preset-btn').forEach(b => b.classList.remove('active'));
+  } else if (type === 'fc') {
+    if (val === 0) {
+      const bf = parseFloat(document.getElementById('inp-basefee').value) || 100;
+      const prem = parseFloat(document.getElementById('inp-premium').value) || 252105;
+      document.getElementById('inp-feecap').value = bf + prem;
+    } else {
+      document.getElementById('inp-feecap').value = val;
+    }
+    document.querySelectorAll('#fc-presets .preset-btn').forEach(b => b.classList.remove('active'));
+  }
+  if (btn) btn.classList.add('active');
+  onGasFeeChange();
+}
+
+function onGasFeeChange() {
+  const bf   = parseFloat(document.getElementById('inp-basefee').value) || 100;
+  const prem = parseFloat(document.getElementById('inp-premium').value) || 252105;
+  const fc   = parseFloat(document.getElementById('inp-feecap').value) || 300000;
+  egp = effectiveGasPrice(bf, prem, fc);
+  document.getElementById('egp-val').textContent = egp.toLocaleString();
+  const effPrem = Math.min(prem, Math.max(0, fc - bf));
+  const cappedNote = effPrem < prem ? ' ⚠ premium capped by GasFeeCap' : '';
+  document.getElementById('egp-sub').textContent = 'attoFIL/gas' + cappedNote;
+  recalc();
+}
+
+// ── Formatting ────────────────────────────────────────────────────────────────
+function fmtGas(g) {
+  if (g >= 1e12) return (g/1e12).toFixed(2) + ' Tgas';
+  if (g >= 1e9)  return (g/1e9).toFixed(2) + ' Ggas';
+  if (g >= 1e6)  return (g/1e6).toFixed(0) + 'M gas';
+  return g.toLocaleString() + ' gas';
+}
+function fmtFIL(f) { return f.toFixed(6) + ' FIL'; }
+function fmtUSD(u) {
+  if (u < 0.0001) return '<$0.0001';
+  if (u < 1) return '$' + u.toFixed(4);
+  return '$' + u.toFixed(2);
+}
+
+// ── Slider sync ───────────────────────────────────────────────────────────────
+function syncSlider() {
+  const v = parseFloat(document.getElementById('sl-pieces').value);
+  const pieces = Math.round(Math.pow(2, v));
+  document.getElementById('inp-pieces').value = pieces;
+  recalc();
+}
+
+// ── Recalc ────────────────────────────────────────────────────────────────────
+function recalc() {
+  const bf    = parseFloat(document.getElementById('inp-basefee').value) || 100;
+  const prem  = parseFloat(document.getElementById('inp-premium').value) || 252105;
+  const fc    = parseFloat(document.getElementById('inp-feecap').value) || 300000;
+  egp = effectiveGasPrice(bf, prem, fc);
+
+  filPrice = parseFloat(document.getElementById('inp-fil').value) || 0.92;
+  const days   = parseInt(document.getElementById('inp-days').value) || 30;
+  const nDs    = parseInt(document.getElementById('inp-ds').value) || 1;
+  const nPcs   = parseInt(document.getElementById('inp-pieces').value) || 100;
+  const nAdd   = parseInt(document.getElementById('inp-add').value) || 0;
+  const batch  = Math.max(1, parseInt(document.getElementById('inp-batch').value) || 1);
+  const nRem   = parseInt(document.getElementById('inp-rem').value) || 0;
+
+  // Per-dataset proving gas per day
+  const ppG   = ppGas(nPcs);
+  const nppG  = NPP_GAS;
+
+  // Live gas if available
+  const ppGasUsed  = GAS?.provePossession || ppG;
+  const nppGasUsed = GAS?.nextProvingPeriod || nppG;
+  const addGasUsed = GAS?.addPieces1 || 281e6;
+  const createG    = GAS?.createDataSet || 796e6;
+  const termG      = GAS?.terminateService || 136e6;
+
+  // Tx counts
+  const ppTxns    = nDs * days;
+  const nppTxns   = nDs * days;
+  const addTxns   = nAdd > 0 ? Math.ceil(nAdd / batch) : 0;
+  const remTxns   = nRem > 0 ? 1 : 0;
+
+  // Gas
+  const ppTotalGas   = ppGasUsed * ppTxns;
+  const nppTotalGas  = nppGasUsed * nppTxns;
+  const addBatchGas  = GAS ? (GAS['addPieces_' + Math.min(batch, 10)] || addGasUsed) : (140e6 + 66e6 * batch);
+  const addTotalGas  = addBatchGas * addTxns;
+  const remTotalGas  = nRem > 0 ? remGas(nRem) * remTxns : 0;
+
+  const totalGas = ppTotalGas + nppTotalGas + addTotalGas + remTotalGas;
+
+  // Cost in FIL
+  const toFIL = g => gasCostFIL(g, egp);
+  const ppFIL    = toFIL(ppTotalGas);
+  const nppFIL   = toFIL(nppTotalGas);
+  const addFIL   = toFIL(addTotalGas);
+  const remFIL   = toFIL(remTotalGas);
+  const totalFIL = ppFIL + nppFIL + addFIL + remFIL;
+  const toUSD = f => f * filPrice;
+
+  // Update table
+  const rows = [
+    ['provePossession', ppTxns, ppGasUsed, ppTotalGas, ppFIL],
+    ['nextProvingPeriod', nppTxns, nppGasUsed, nppTotalGas, nppFIL],
+    ['addPieces (×' + batch + ')', addTxns, addBatchGas, addTotalGas, addFIL],
+    ['removePieces (×' + nRem + ')', remTxns, nRem > 0 ? remGas(nRem) : 0, remTotalGas, remFIL],
+  ];
+
+  document.getElementById('cost-tbody').innerHTML = rows.map(([op, txns, gpt, tg, fil]) => `
+    <tr>
+      <td style="font-weight:500;color:var(--text)">${op}</td>
+      <td class="tr mono">${txns.toLocaleString()}</td>
+      <td class="tr mono">${fmtGas(gpt)}</td>
+      <td class="tr mono">${fmtGas(tg)}</td>
+      <td class="tr mono">${fmtFIL(fil)}</td>
+      <td class="tr mono">${fmtUSD(toUSD(fil))}</td>
+    </tr>`).join('');
+
+  document.getElementById('tot-gas').textContent = fmtGas(totalGas);
+  document.getElementById('tot-fil').textContent = fmtFIL(totalFIL);
+  document.getElementById('tot-usd').textContent = fmtUSD(toUSD(totalFIL));
+  document.getElementById('breakdown-sub').textContent = days + ' days · ' + nDs + ' datasets · EGP ' + egp.toLocaleString() + ' attoFIL/gas';
+
+  // ── Cost detail per operation ─────────────────────────────────────────────
+  const detailOps = [
+    { op: 'provePossession (per tx)', gas: ppGasUsed },
+    { op: 'nextProvingPeriod (per tx)', gas: nppGasUsed },
+    { op: 'addPieces ×' + batch + ' (per tx)', gas: addBatchGas },
+  ];
+  if (nRem > 0) detailOps.push({ op: 'removePieces ×' + nRem + ' (per tx)', gas: remGas(nRem) });
+
+  document.getElementById('cost-detail-grid').innerHTML = detailOps.map(({ op, gas }) => {
+    const burnF = burnFIL(gas, bf);
+    const tipF  = tipFIL(gas, bf, prem, fc);
+    const totF  = burnF + tipF;
+    return `<div class="cdc">
+      <div class="cdc-op">${op}</div>
+      <div class="cdc-row"><span class="cdc-key">Gas used</span><span class="cdc-val">${fmtGas(gas)}</span></div>
+      <div class="cdc-row"><span class="cdc-key">Burned (BaseFee × gas)</span><span class="cdc-val burn">${fmtFIL(burnF)}</span></div>
+      <div class="cdc-row"><span class="cdc-key">Miner tip (Premium × gas)</span><span class="cdc-val tip">${fmtFIL(tipF)}</span></div>
+      <div class="cdc-row"><span class="cdc-key">Total</span><span class="cdc-val total">${fmtFIL(totF)} · ${fmtUSD(totF * filPrice)}</span></div>
+    </div>`;
+  }).join('');
+
+  // ── Summary ───────────────────────────────────────────────────────────────
+  const dailyGas = (ppGasUsed + nppGasUsed) * nDs;
+  const dailyPct = (dailyGas / GAS_TARGET * 100).toFixed(4);
+  const dailyFIL = toFIL(dailyGas);
+  const perDsMonth = toFIL((ppGasUsed + nppGasUsed) * 30);
+  const perPieceFIL = nAdd > 0 ? toFIL(addBatchGas) / batch : 0;
+
+  document.getElementById('sum-daily-gas').textContent = fmtGas(dailyGas);
+  document.getElementById('sum-daily-pct').textContent = dailyPct + '% of daily gas target';
+  document.getElementById('sum-daily-fil').textContent = fmtFIL(dailyFIL);
+  document.getElementById('sum-daily-usd').textContent = fmtUSD(toUSD(dailyFIL)) + '/day';
+  document.getElementById('sum-per-ds').textContent = fmtUSD(toUSD(perDsMonth));
+  document.getElementById('sum-per-piece').textContent = nAdd > 0 ? fmtFIL(perPieceFIL) : '—';
+  document.getElementById('sum-per-piece-sub').textContent = nAdd > 0 ? fmtUSD(toUSD(perPieceFIL)) + '/piece · batch ×' + batch : 'no uploads';
+}
+
+// ── Load live gas from FOC Observer ──────────────────────────────────────────
+async function loadGasData() {
+  const r = await fetch('https://foc-observer.va.gg/sql', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      sql: `
+        SELECT op, ROUND(AVG(gas_used)) as avg_gas, ROUND(AVG(effective_gas_price)) as avg_egp
+        FROM (
+          SELECT 'provePossession' as op, gas_used, effective_gas_price FROM pdp_possession_proven WHERE timestamp >= EXTRACT(EPOCH FROM NOW())-86400*30
+          UNION ALL SELECT 'nextProvingPeriod', gas_used, effective_gas_price FROM pdp_next_proving_period WHERE timestamp >= EXTRACT(EPOCH FROM NOW())-86400*30
+          UNION ALL SELECT 'addPieces_1', gas_used, effective_gas_price FROM pdp_pieces_added WHERE piece_count=1 AND timestamp >= EXTRACT(EPOCH FROM NOW())-86400*30
+          UNION ALL SELECT 'addPieces_2', gas_used, effective_gas_price FROM pdp_pieces_added WHERE piece_count=2 AND timestamp >= EXTRACT(EPOCH FROM NOW())-86400*30
+          UNION ALL SELECT 'addPieces_5', gas_used, effective_gas_price FROM pdp_pieces_added WHERE piece_count=5 AND timestamp >= EXTRACT(EPOCH FROM NOW())-86400*30
+          UNION ALL SELECT 'addPieces_10', gas_used, effective_gas_price FROM pdp_pieces_added WHERE piece_count=10 AND timestamp >= EXTRACT(EPOCH FROM NOW())-86400*30
+          UNION ALL SELECT 'createDataSet', gas_used, effective_gas_price FROM fwss_data_set_created WHERE timestamp >= EXTRACT(EPOCH FROM NOW())-86400*30
+          UNION ALL SELECT 'terminateService', gas_used, effective_gas_price FROM fwss_service_terminated WHERE timestamp >= EXTRACT(EPOCH FROM NOW())-86400*30
+          UNION ALL SELECT 'removePieces_1', gas_used, effective_gas_price FROM pdp_pieces_removed WHERE piece_count=1 AND timestamp >= EXTRACT(EPOCH FROM NOW())-86400*30
+        ) t GROUP BY op`,
+      network: 'mainnet'
+    })
+  });
+  const d = await r.json();
+  GAS = {};
+  d.rows.forEach(row => { GAS[row.op] = parseFloat(row.avg_gas); });
+  GAS.addPieces1 = GAS.addPieces_1 || 281e6;
+  GAS.provePossession = GAS.provePossession || 190e6;
+  GAS.nextProvingPeriod = GAS.nextProvingPeriod || 124e6;
+
+  // Render gas ref grid
+  const ops = [
+    { label: 'provePossession', key: 'provePossession', note: 'per proof' },
+    { label: 'nextProvingPeriod', key: 'nextProvingPeriod', note: 'per period' },
+    { label: 'addPieces ×1', key: 'addPieces_1', note: 'per tx' },
+    { label: 'addPieces ×10', key: 'addPieces_10', note: 'per tx' },
+    { label: 'createDataSet', key: 'createDataSet', note: 'per dataset' },
+    { label: 'terminateService', key: 'terminateService', note: 'per dataset' },
+    { label: 'removePieces ×1', key: 'removePieces_1', note: 'per tx' },
+  ];
+  document.getElementById('gas-ref-grid').innerHTML = ops.map(({ label, key, note }) => {
+    const gas = GAS[key] || 0;
+    const fil = gasCostFIL(gas, egp);
+    const usd = fil * filPrice;
+    return `<div class="gas-ref-card">
+      <div class="grc-label">${label}</div>
+      <div class="grc-gas">${fmtGas(gas)}</div>
+      <div class="grc-fil">${fmtFIL(fil)}</div>
+      <div class="grc-usd">${fmtUSD(usd)} · ${note}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── Load FIL price ────────────────────────────────────────────────────────────
+async function loadFILPrice() {
+  try {
+    const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=filecoin&vs_currencies=usd');
+    const d = await r.json();
+    filPrice = d?.filecoin?.usd || 0.92;
+    document.getElementById('inp-fil').value = filPrice.toFixed(3);
+  } catch(e) {}
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+async function init() {
+  onGasFeeChange(); // set initial EGP
+  await Promise.allSettled([loadFILPrice(), loadGasData()]);
+  recalc();
+  document.getElementById('status-txt').textContent = 'Live · ' + new Date().toLocaleTimeString();
+}
+
+// Slider sync on load
+document.getElementById('inp-pieces').addEventListener('input', () => {
+  const v = Math.log2(Math.max(1, parseInt(document.getElementById('inp-pieces').value) || 1));
+  document.getElementById('sl-pieces').value = Math.min(20, Math.max(0, v));
+});
+
+init();
+</script>
+</body>
+</html>
