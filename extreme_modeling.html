@@ -196,7 +196,7 @@ table.st tbody tr:hover td { background: var(--bg); }
         </div>
 
         <div style="margin-top:12px;font-size:12px;color:var(--text3);line-height:1.5">
-          Model: <code style="font-family:var(--mono);background:var(--bg);padding:1px 5px;border-radius:3px">215M + 66M × K</code> per tx.
+          Model: <code style="font-family:var(--mono);background:var(--bg);padding:1px 5px;border-radius:3px">228.72M + 78.20M × K</code> per tx.
           Critical threshold: K &gt; 368 → tx exceeds tipset budget → stuck forever.
           Beyond ×10: unobserved on mainnet, linearly extrapolated.
         </div>
@@ -335,10 +335,10 @@ table.st tbody tr:hover td { background: var(--bg); }
       </tr></thead>
       <tbody>
         <tr>
-          <td style="font-weight:500">addPieces × 369 (one more than threshold)</td>
+          <td style="font-weight:500">addPieces × 311 (one more than threshold)</td>
           <td style="font-family:var(--mono);font-size:12px">24.5 Bgas (tipset limit)</td>
           <td><span class="badge crit">STUCK FOREVER</span></td>
-          <td style="font-size:12px;color:var(--text3)">K_critical = (24.5B − 215M) / 66M</td>
+          <td style="font-size:12px;color:var(--text3)">K_critical = (24.5B − 228.72M) / 78.20M</td>
         </tr>
         <tr>
           <td style="font-weight:500">NPP with 2,000 pending removals</td>
@@ -379,6 +379,8 @@ table.st tbody tr:hover td { background: var(--bg); }
 <script>
 const GAS_TARGET  = 70560e9;  // gas units
 const TIPSET      = 24.5e9;   // gas units
+const ADD_MODEL_ALPHA = 228.72e6;
+const ADD_MODEL_BETA  = 78.20e6;
 const CREATE_GAS  = 796e6;
 const TERM_GAS    = 136e6;
 const NPP_BASE    = 124e6;
@@ -428,7 +430,7 @@ function setBg(ggas, key, btn) {
 function updateAddPieces() {
   const K = parseInt(document.getElementById('sl-add-k').value);
   document.getElementById('add-k-val').textContent = K;
-  const gasPerTx = 215e6 + 66e6 * K;
+  const gasPerTx = ADD_MODEL_ALPHA + ADD_MODEL_BETA * K;
   const txPct    = pct(gasPerTx, TIPSET);
   const dailyGas = gasPerTx; // single tx scenario
   const dailyPct = pct(dailyGas + bgGas, GAS_TARGET);
@@ -441,12 +443,12 @@ function updateAddPieces() {
   document.getElementById('add-tipset-pct').className = 'db-num-val ' + fillClass(txPct);
 
   const note = document.getElementById('add-threshold-note');
-  if (K >= 369) {
+  if (K >= 311) {
     note.className = 'threshold-note crit';
     note.textContent = '⚠ Exceeds tipset budget — this transaction would be stuck forever';
   } else if (K >= 200) {
     note.className = 'threshold-note warn';
-    note.textContent = 'Approaching critical threshold (K=369). Tx is very large.';
+    note.textContent = 'Approaching critical threshold (K=311). Tx is very large.';
   } else {
     note.className = 'threshold-note';
   }
