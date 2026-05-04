@@ -55,9 +55,13 @@ body { font-family:var(--sans); background:var(--bg); color:var(--text); font-si
 .preset-btn.active { background:var(--blue-bg); border-color:var(--blue-b); color:var(--blue); font-weight:600; }
 
 /* GAS REF */
-.gas-ref-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(155px,1fr)); gap:10px; margin-bottom:16px; }
-.gas-ref-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); padding:12px 14px; box-shadow:var(--shadow); }
-.grc-label { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:var(--text3); margin-bottom:5px; }
+.gas-ref-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:10px; margin-bottom:16px; }
+.gas-ref-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); padding:12px 14px; box-shadow:var(--shadow); position:relative; }
+.gas-ref-card .freshness { position:absolute; top:8px; right:8px; font-size:8px; padding:1px 5px; border-radius:3px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; }
+.freshness.live { background:var(--green-bg); color:var(--green); border:1px solid var(--green-b); }
+.freshness.cached { background:var(--yellow-bg); color:var(--yellow); border:1px solid #fde68a; }
+.freshness.stale { background:var(--red-bg); color:var(--red); border:1px solid var(--red-b); }
+.grc-label { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:var(--text3); margin-bottom:5px; padding-right:42px; }
 .grc-gas { font-family:var(--mono); font-size:14px; font-weight:700; color:var(--text); }
 .grc-fil { font-family:var(--mono); font-size:11px; color:var(--blue); margin-top:2px; }
 .grc-usd { font-size:11px; color:var(--text3); margin-top:1px; }
@@ -259,8 +263,8 @@ table.bt tfoot td { padding:9px 14px; font-weight:700; color:var(--text); backgr
       </label>
       <div style="font-size:11px;color:var(--text3);margin-top:6px;line-height:1.5">
         3 FilecoinPay rails instead of 1.<br>
-        createDataSet: +45M (~840M total)<br>
-        terminateService: +105M (~241M total)
+        createDataSet CDN: ~+287M observed<br>
+        terminateService CDN: ~+105M
       </div>
     </div>
   </div>
@@ -293,8 +297,13 @@ table.bt tfoot td { padding:9px 14px; font-weight:700; color:var(--text); backgr
     <span style="color:var(--text3);font-size:12px;margin-left:6px" id="floor-price-sub"></span>
   </div>
 
+  <!-- INFO BOX about createDataSet methodology -->
+  <div class="info-box">
+    <strong>Note on createDataSet costs:</strong> Since v1.2.0 (March 19, 2026), 100% of mainnet calls go through the combined <code>create+addPieces</code> path (Synapse SDK default). Two values are shown: <strong>combined create+1piece</strong> (observed directly, what real users pay) and <strong>createDataSet only</strong> (reconstructed by subtracting standalone addPieces K=1; relevant for the sybil-defense threat model — the cost an attacker pays to spawn empty datasets via PDPVerifier).
+  </div>
+
   <!-- GAS REFERENCE GRID -->
-  <div class="section-title">Gas per operation (30d avg · live from FOC Observer)</div>
+  <div class="section-title">Gas per operation (post-v1.2.0 mainnet · live from FOC Observer)</div>
   <div class="gas-ref-grid" id="gas-ref-grid">
     <div class="loading"><div class="spinner"></div>Loading...</div>
   </div>
@@ -327,15 +336,15 @@ table.bt tfoot td { padding:9px 14px; font-weight:700; color:var(--text); backgr
       </div>
       <div class="param-group">
         <div class="param-label">Pieces to add <span style="color:var(--text3);font-weight:400">→ addPieces cost</span></div>
-        <div class="param-sub">Total uploads during period</div>
+        <div class="param-sub">Total uploads during period (1st piece bundled with createDataSet)</div>
         <input class="param-input" type="number" id="inp-add" value="1000" min="0" oninput="recalc()">
         <input class="param-slider" type="range" id="sl-add" min="0" max="100000" value="1000" step="100" oninput="document.getElementById('inp-add').value=this.value;recalc()">
       </div>
       <div class="param-group">
         <div class="param-label">Batch size <span style="color:var(--text3);font-weight:400">→ pieces per addPieces tx</span></div>
-        <div class="param-sub">Larger = cheaper per piece. <strong style="color:var(--orange)">K&gt;10: extrapolated. K&gt;368: stuck.</strong></div>
+        <div class="param-sub">Larger = cheaper per piece. <strong style="color:var(--orange)">K&gt;10: extrapolated. K&gt;310: stuck.</strong></div>
         <input class="param-input" type="number" id="inp-batch" value="1" min="1" max="368" oninput="recalc();checkBatch()">
-        <div class="warn-box" id="batch-warn">⚠ Beyond ×10: no mainnet data — linear extrapolation (215M + 66M×K). Beyond ×310: tx exceeds tipset budget → stuck forever.</div>
+        <div class="warn-box" id="batch-warn">⚠ Beyond ×10: no mainnet data — linear extrapolation (228.72M + 78.20M×K). Beyond ×310: tx exceeds tipset budget → stuck forever.</div>
       </div>
       <div class="param-group">
         <div class="param-label">Pieces to remove <span style="color:var(--text3);font-weight:400">→ removePieces cost</span></div>
@@ -348,6 +357,9 @@ table.bt tfoot td { padding:9px 14px; font-weight:700; color:var(--text); backgr
         <div class="param-sub">How many days to model</div>
         <input class="param-input" type="number" id="inp-days2" value="30" min="1" max="365" oninput="document.getElementById('inp-days').value=this.value;recalc()">
       </div>
+    </div>
+    <div style="margin-top:14px;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:7px;font-size:12px;color:var(--text2);line-height:1.5">
+      <strong>Real-world flow assumption:</strong> The first piece is uploaded as part of <code style="background:rgba(59,111,245,.1);padding:1px 5px;border-radius:3px;font-family:var(--mono);font-size:11px;color:var(--blue)">createDataSet + addPieces (K=1)</code> in a single tx (Synapse SDK default). The remaining <code style="background:rgba(59,111,245,.1);padding:1px 5px;border-radius:3px;font-family:var(--mono);font-size:11px;color:var(--blue)">N-1</code> pieces are uploaded via standalone addPieces with the chosen batch size.
     </div>
   </div>
 
@@ -397,12 +409,12 @@ table.bt tfoot td { padding:9px 14px; font-weight:700; color:var(--text); backgr
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);margin-bottom:16px;overflow:hidden">
     <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
       <div style="font-size:14px;font-weight:600">Complete gas reference — all operations</div>
-      <div style="font-size:12px;color:var(--text3)">30d avg from FOC Observer</div>
+      <div style="font-size:12px;color:var(--text3)">post-v1.2.0 from FOC Observer</div>
     </div>
     <div style="overflow-x:auto">
       <table class="ref-table">
         <thead><tr>
-          <th>Operation</th><th class="tr">Avg gas (30d)</th><th class="tr">FIL/tx</th><th class="tr">USD/tx</th><th>Who pays</th><th>When</th>
+          <th>Operation</th><th class="tr">Avg gas</th><th class="tr">FIL/tx</th><th class="tr">USD/tx</th><th>Who pays</th><th>When</th>
         </tr></thead>
         <tbody id="ref-tbody"><tr><td colspan="6" style="text-align:center;padding:18px;color:var(--text3)">Loading...</td></tr></tbody>
       </table>
@@ -427,8 +439,23 @@ table.bt tfoot td { padding:9px 14px; font-weight:700; color:var(--text); backgr
         <div style="font-size:11px;color:var(--text3);margin-top:4px">Binned averages from real mainnet datasets (FOC Observer). Note: the model tends to overestimate gas for medium piece counts — the real distribution is flatter than the log₂ curve suggests, possibly due to SP-specific optimizations.</div>
       </div>
       <div style="margin-top:18px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:8px">createDataSet model — two values</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.7">Since v1.2.0 (March 19, 2026), 100% of mainnet createDataSet calls go through the combined create+add path via Synapse SDK. Two values shown:<br><br>
+        <strong>1. Combined create+1piece (observed):</strong> the actual gas a user pays today via Synapse SDK. Filtered: <code style="background:var(--bg);border:1px solid var(--border);padding:1px 5px;border-radius:3px;font-size:11px">pdp_data_set_created JOIN pdp_pieces_added (piece_count=1) post-v1.2.0</code>.<br>
+        Currently ~1087M no-CDN, ~1374M CDN (n=475/n=5).<br><br>
+        <strong>2. createDataSet only (reconstructed):</strong> the dataset creation cost in isolation, computed as <code style="background:var(--bg);border:1px solid var(--border);padding:1px 5px;border-radius:3px;font-size:11px">combined K=1 − standalone addPieces K=1</code>. This represents what an attacker would pay to spawn an empty dataset directly via PDPVerifier (relevant for sybil defense thresholds). Currently ~770M no-CDN.</div>
+      </div>
+      <div style="margin-top:18px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:8px">Real-world flow modeling</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.7">When the user specifies "Pieces to add = N" with batch size K, the calculator models the actual mainnet flow: 1 combined <code style="background:var(--bg);border:1px solid var(--border);padding:1px 5px;border-radius:3px;font-size:11px">createDataSet+addPieces(K=1)</code> tx (the first piece is bundled), followed by <code style="background:var(--bg);border:1px solid var(--border);padding:1px 5px;border-radius:3px;font-size:11px">⌈(N-1)/K⌉</code> standalone addPieces transactions for the remaining pieces.</div>
+      </div>
+      <div style="margin-top:18px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:8px">Live data and fallbacks</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.7">Each gas value is fetched live from FOC Observer with this priority: <strong style="color:var(--green)">live</strong> (query succeeded just now) → <strong style="color:var(--yellow)">cached</strong> (last successful query stored in browser localStorage) → <strong style="color:var(--red)">stale</strong> (hardcoded fallback baked at build time). The freshness badge on each card tells you which.</div>
+      </div>
+      <div style="margin-top:18px">
         <div style="font-size:13px;font-weight:600;margin-bottom:8px">removePieces model</div>
-        <div style="font-size:12px;color:var(--text2);line-height:1.7">Gas scales sublinearly with K (pieces removed per tx) — multiple pieces share Sum Tree ancestor nodes in the same tx (warm access: ~200 gas vs ~5,000). O(K × log₂N) theoretical formula not clearly confirmed by observed data (N not tracked at removal time in FOC Observer). Model: observed values for K≤144, linear interpolation between points, K^0.614 extrapolation beyond K=144.</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.7">Gas scales sublinearly with K (pieces removed per tx) — multiple pieces share Sum Tree ancestor nodes in the same tx (warm access: ~200 gas vs ~5,000). Model: observed values for K≤144, linear interpolation between points, K^0.614 extrapolation beyond K=144.</div>
       </div>
       <div style="margin-top:18px">
         <div style="font-size:13px;font-weight:600;margin-bottom:8px">Gas fee model</div>
@@ -444,6 +471,9 @@ table.bt tfoot td { padding:9px 14px; font-weight:700; color:var(--text); backgr
 const MODEL_ALPHA = 158.67e6, MODEL_BETA = 8.485e6, NPP_GAS = 124e6;
 const GAS_TARGET  = 70560e9;
 const TIPSET      = 24.5e9;
+
+// v1.2.0 deploy: March 19, 2026 → unix epoch
+const V12_TS = 1742428800;
 
 const REM_OBS = {1:407e6,2:601e6,3:781e6,4:950e6,5:1010e6,9:840e6,20:1754e6,50:5900e6,80:9530e6,125:8075e6,144:8600e6};
 function remGas(K) {
@@ -461,11 +491,7 @@ const FIP_REGIMES = {
   post: { bf:200000, prem:28000,  fc:250000, note:'Post FIP-0115 (estimated): BaseFee ~222k, GasPremium ~28k. BaseFee becomes ~89% of EGP. Status: Draft.' },
 };
 
-// addPieces gas model: gas = 228.72M + 78.20M × K
-// Fitted on 90d mainnet data (K=1..9), R²=0.9996, MAE=3.4M
-// K=1..9: observed mainnet values (90d avg from FOC Observer)
-// K>9: linear extrapolation using fitted model
-// K>310: exceeds tipset budget (24.5 Bgas) → tx stuck forever
+// addPieces gas model: gas = 228.72M + 78.20M × K (R²=0.9996, MAE=3.4M)
 const ADD_MODEL_ALPHA = 228.72e6;
 const ADD_MODEL_BETA  = 78.20e6;
 function addPiecesModel(k) { return ADD_MODEL_ALPHA + ADD_MODEL_BETA * k; }
@@ -487,12 +513,69 @@ const BATCH_DATA = [
   {k:310,gas:null,   src:'⚠ tipset budget limit'},
 ];
 
-// Binned averages from real mainnet datasets (FOC Observer, April 2026)
-// Each point = avg gas of all datasets with that piece count
 const PP_DATA = [[1,156.7],[2,168.2],[4,166.1],[8,164.9],[16,174.2],[32,195.3],[64,191.0],[128,182.1],[256,187.9]];
 
 let GAS = null, filPrice = 0.92, egp = 252205;
 let HIST_EGP = {};
+
+// ── Persistent fallback layer ────────────────────────────────────────────────
+// Hardcoded ULTIMATE fallbacks (baked at build time, used only if no live and no localStorage).
+// These are post-v1.2.0 mainnet values from FOC Observer at the time of build.
+const HARDCODED_FALLBACK = {
+  provePossession:        190e6,
+  nextProvingPeriod:      124e6,
+  addPieces_1:            316.38e6,
+  addPieces_2:            378.5e6,
+  addPieces_3:            460.2e6,
+  addPieces_5:            625.2e6,
+  addPieces_9:            929.0e6,
+  addPieces_10:           1010e6,
+  // createDataSet: combined create+addPieces(K=1), what real users pay
+  createDataSet_combined_noCdn: 1086.68e6,
+  createDataSet_combined_cdn:   1373.76e6,
+  // createDataSet only (reconstructed = combined - standalone addPieces K=1)
+  createDataSet_only_noCdn:     770.30e6, // 1086.68 - 316.38
+  createDataSet_only_cdn:       1057.38e6, // 1373.76 - 316.38
+  terminateService_noCdn: 136e6,
+  terminateService_cdn:   241e6,
+  removePieces_1:         407e6,
+};
+
+const STORAGE_KEY = 'fwss_calc_fallbacks_v2';
+const STORAGE_TTL_MS = 24*60*60*1000; // 24h: cached values older than this still used but flagged 'cached', super-old still flagged stale
+
+function loadCachedFallbacks() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || !parsed.values || !parsed.timestamp) return null;
+    return parsed;
+  } catch(e) { return null; }
+}
+
+function saveCachedFallbacks(values) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      values: values,
+      timestamp: Date.now()
+    }));
+  } catch(e) {}
+}
+
+// Returns {value, freshness: 'live'|'cached'|'stale'} for a given key.
+// Priority: live (GAS object populated by current query) > localStorage (recent) > hardcoded
+function getValueWithFreshness(key) {
+  if (GAS && GAS[key] != null && GAS[key] > 0) {
+    return { value: GAS[key], freshness: 'live' };
+  }
+  const cached = loadCachedFallbacks();
+  if (cached && cached.values[key] != null && cached.values[key] > 0) {
+    const ageMs = Date.now() - cached.timestamp;
+    return { value: cached.values[key], freshness: ageMs < STORAGE_TTL_MS ? 'cached' : 'stale' };
+  }
+  return { value: HARDCODED_FALLBACK[key] || 0, freshness: 'stale' };
+}
 
 // ── Gas fee ───────────────────────────────────────────────────────────────────
 function effectiveGasPrice(bf, prem, fc) {
@@ -611,7 +694,7 @@ function applyHistEGP(period) {
 
 // ── Batching table ────────────────────────────────────────────────────────────
 function renderBatchTable() {
-  const base1 = 281.5e6;
+  const base1 = 316.38e6;
   document.getElementById('batch-tbody').innerHTML = BATCH_DATA.map(({k,gas,src}) => {
     const g = gas!==null ? gas : addPiecesModel(k);
     const gpp = g/k;
@@ -648,17 +731,14 @@ function drawPPChart() {
     const lbl=x>=1e6?(x/1e6).toFixed(0)+'M':x>=1000?(x/1000)+'k':x+'';
     ctx.fillText(lbl,px,H-PAD.b+13);
   });
-  // band
   ctx.fillStyle='rgba(59,111,245,0.07)';
   ctx.beginPath(); let first=true;
   for(let x=1;x<=2e8;x*=1.15){ const y=158.67+8.485*Math.log2(x)+14.4; first?ctx.moveTo(toX(x),toY(y)):ctx.lineTo(toX(x),toY(y)); first=false; }
   for(let x=2e8;x>=1;x/=1.15){ ctx.lineTo(toX(x),toY(158.67+8.485*Math.log2(x)-14.4)); }
   ctx.closePath(); ctx.fill();
-  // model line
   ctx.strokeStyle='#3b6ff5'; ctx.lineWidth=2; ctx.beginPath(); first=true;
   for(let x=1;x<=2e8;x*=1.05){ const y=158.67+8.485*Math.log2(x); first?ctx.moveTo(toX(x),toY(y)):ctx.lineTo(toX(x),toY(y)); first=false; }
   ctx.stroke();
-  // data points — simple dots, no deviation lines
   PP_DATA.forEach(([x,y])=>{
     ctx.fillStyle='#1a1d2e';
     ctx.beginPath(); ctx.arc(toX(x),toY(y),5,0,Math.PI*2); ctx.fill();
@@ -668,7 +748,6 @@ function drawPPChart() {
   ctx.fillStyle='#5a6075'; ctx.font='11px Inter'; ctx.textAlign='center';
   ctx.fillText('Pieces per dataset (log₂ scale)',W/2,H-2);
   ctx.save(); ctx.translate(12,H/2); ctx.rotate(-Math.PI/2); ctx.fillText('Gas (M)',0,0); ctx.restore();
-  // legend
   ctx.textAlign='left'; ctx.font='11px Inter'; ctx.fillStyle='#3b6ff5';
   ctx.fillText('— model: 158.67M + 8.485M×log₂(N)', PAD.l+6, PAD.t+14);
   ctx.fillStyle='rgba(59,111,245,0.35)'; ctx.fillRect(PAD.l+6,PAD.t+21,28,6);
@@ -711,48 +790,113 @@ function drawCostChart(labels, values) {
 
 // ── Load gas data ─────────────────────────────────────────────────────────────
 async function loadGasData() {
-  const r = await fetch('https://foc-observer.va.gg/sql', {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({
-      sql:`SELECT op, ROUND(AVG(gas_used)) as avg_gas, COUNT(*) as n
-        FROM (
-          SELECT 'provePossession' as op, gas_used FROM pdp_possession_proven WHERE timestamp>=EXTRACT(EPOCH FROM NOW())-86400*30
-          UNION ALL SELECT 'nextProvingPeriod', gas_used FROM pdp_next_proving_period WHERE timestamp>=EXTRACT(EPOCH FROM NOW())-86400*30
-          UNION ALL SELECT 'addPieces_1', gas_used FROM pdp_pieces_added WHERE piece_count=1 AND timestamp>=EXTRACT(EPOCH FROM NOW())-86400*30
-          UNION ALL SELECT 'addPieces_2', gas_used FROM pdp_pieces_added WHERE piece_count=2 AND timestamp>=EXTRACT(EPOCH FROM NOW())-86400*30
-          UNION ALL SELECT 'addPieces_3', gas_used FROM pdp_pieces_added WHERE piece_count=3 AND timestamp>=EXTRACT(EPOCH FROM NOW())-86400*30
-          UNION ALL SELECT 'addPieces_5', gas_used FROM pdp_pieces_added WHERE piece_count=5 AND timestamp>=EXTRACT(EPOCH FROM NOW())-86400*30
-          UNION ALL SELECT 'addPieces_9', gas_used FROM pdp_pieces_added WHERE piece_count=9 AND timestamp>=EXTRACT(EPOCH FROM NOW())-86400*30
-          UNION ALL SELECT 'addPieces_10', gas_used FROM pdp_pieces_added WHERE piece_count=10 AND timestamp>=EXTRACT(EPOCH FROM NOW())-86400*30
-          UNION ALL SELECT 'createDataSet', gas_used FROM fwss_data_set_created WHERE timestamp>=EXTRACT(EPOCH FROM NOW())-86400*30
-          UNION ALL SELECT 'terminateService', gas_used FROM fwss_service_terminated WHERE timestamp>=EXTRACT(EPOCH FROM NOW())-86400*30
-          UNION ALL SELECT 'removePieces_1', gas_used FROM pdp_pieces_removed WHERE piece_count=1 AND timestamp>=EXTRACT(EPOCH FROM NOW())-86400*30
-        ) t GROUP BY op`,
-      network:'mainnet'
-    })
-  });
-  const d = await r.json();
-  GAS = {};
-  d.rows.forEach(row => { GAS[row.op] = parseFloat(row.avg_gas); GAS[row.op+'_n'] = parseInt(row.n); });
+  // Single batched query:
+  //  - provePossession, nextProvingPeriod (post-v1.2.0)
+  //  - addPieces standalone by piece_count (post-v1.2.0, no createDataSet in tx)
+  //  - createDataSet combined (post-v1.2.0, joined to pdp_pieces_added with piece_count=1, split by with_cdn)
+  //  - terminateService (split by with_cdn? we use the dataset's with_cdn via fwss_data_set_created)
+  //  - removePieces_1
+  const sql = `SELECT op, ROUND(AVG(gas_used)) as avg_gas, COUNT(*) as n
+    FROM (
+      SELECT 'provePossession' as op, gas_used FROM pdp_possession_proven WHERE timestamp>=EXTRACT(EPOCH FROM NOW())-86400*30
+      UNION ALL SELECT 'nextProvingPeriod', gas_used FROM pdp_next_proving_period WHERE timestamp>=EXTRACT(EPOCH FROM NOW())-86400*30
+      UNION ALL SELECT 'addPieces_1' as op, p.gas_used FROM pdp_pieces_added p
+        WHERE p.piece_count=1 AND p.timestamp>=${V12_TS}
+        AND NOT EXISTS (SELECT 1 FROM pdp_data_set_created d WHERE d.tx_hash=p.tx_hash)
+      UNION ALL SELECT 'addPieces_2', p.gas_used FROM pdp_pieces_added p
+        WHERE p.piece_count=2 AND p.timestamp>=${V12_TS}
+        AND NOT EXISTS (SELECT 1 FROM pdp_data_set_created d WHERE d.tx_hash=p.tx_hash)
+      UNION ALL SELECT 'addPieces_3', p.gas_used FROM pdp_pieces_added p
+        WHERE p.piece_count=3 AND p.timestamp>=${V12_TS}
+        AND NOT EXISTS (SELECT 1 FROM pdp_data_set_created d WHERE d.tx_hash=p.tx_hash)
+      UNION ALL SELECT 'addPieces_5', p.gas_used FROM pdp_pieces_added p
+        WHERE p.piece_count=5 AND p.timestamp>=${V12_TS}
+        AND NOT EXISTS (SELECT 1 FROM pdp_data_set_created d WHERE d.tx_hash=p.tx_hash)
+      UNION ALL SELECT 'addPieces_9', p.gas_used FROM pdp_pieces_added p
+        WHERE p.piece_count=9 AND p.timestamp>=${V12_TS}
+        AND NOT EXISTS (SELECT 1 FROM pdp_data_set_created d WHERE d.tx_hash=p.tx_hash)
+      UNION ALL SELECT 'addPieces_10', p.gas_used FROM pdp_pieces_added p
+        WHERE p.piece_count=10 AND p.timestamp>=${V12_TS}
+        AND NOT EXISTS (SELECT 1 FROM pdp_data_set_created d WHERE d.tx_hash=p.tx_hash)
+      UNION ALL SELECT 'createDataSet_combined_noCdn', d.gas_used
+        FROM pdp_data_set_created d
+        JOIN fwss_data_set_created f ON f.data_set_id=d.set_id
+        JOIN pdp_pieces_added p ON p.tx_hash=d.tx_hash
+        WHERE d.timestamp>=${V12_TS} AND f.with_cdn=false AND p.piece_count=1
+      UNION ALL SELECT 'createDataSet_combined_cdn', d.gas_used
+        FROM pdp_data_set_created d
+        JOIN fwss_data_set_created f ON f.data_set_id=d.set_id
+        JOIN pdp_pieces_added p ON p.tx_hash=d.tx_hash
+        WHERE d.timestamp>=${V12_TS} AND f.with_cdn=true AND p.piece_count=1
+      UNION ALL SELECT 'terminateService_noCdn', t.gas_used
+        FROM fwss_service_terminated t
+        JOIN fwss_data_set_created f ON f.data_set_id=t.data_set_id
+        WHERE t.timestamp>=${V12_TS} AND f.with_cdn=false
+      UNION ALL SELECT 'terminateService_cdn', t.gas_used
+        FROM fwss_service_terminated t
+        JOIN fwss_data_set_created f ON f.data_set_id=t.data_set_id
+        WHERE t.timestamp>=${V12_TS} AND f.with_cdn=true
+      UNION ALL SELECT 'removePieces_1', gas_used FROM pdp_pieces_removed WHERE piece_count=1 AND timestamp>=EXTRACT(EPOCH FROM NOW())-86400*30
+    ) t GROUP BY op`;
 
-  // Gas ref grid
+  let d;
+  try {
+    const r = await fetch('https://foc-observer.va.gg/sql', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ sql, network:'mainnet' })
+    });
+    d = await r.json();
+  } catch(e) {
+    console.warn('[FWSS] loadGasData failed, using cached/hardcoded fallbacks', e);
+    GAS = null;
+    renderGasGrid();
+    return;
+  }
+
+  GAS = {};
+  d.rows.forEach(row => {
+    const v = parseFloat(row.avg_gas);
+    if (v > 0) {
+      GAS[row.op] = v;
+      GAS[row.op+'_n'] = parseInt(row.n);
+    }
+  });
+
+  // Compute reconstructed createDataSet only (combined - standalone addPieces K=1)
+  if (GAS.createDataSet_combined_noCdn && GAS.addPieces_1) {
+    GAS.createDataSet_only_noCdn = GAS.createDataSet_combined_noCdn - GAS.addPieces_1;
+  }
+  if (GAS.createDataSet_combined_cdn && GAS.addPieces_1) {
+    GAS.createDataSet_only_cdn = GAS.createDataSet_combined_cdn - GAS.addPieces_1;
+  }
+
+  // Save to localStorage for next time
+  const persist = {};
+  Object.keys(HARDCODED_FALLBACK).forEach(k => {
+    if (GAS[k] != null && GAS[k] > 0) persist[k] = GAS[k];
+  });
+  if (Object.keys(persist).length > 0) saveCachedFallbacks(persist);
+
+  renderGasGrid();
+}
+
+function renderGasGrid() {
   const cdn = document.getElementById('cdn-toggle')?.checked;
   const ops = [
-    {label:'provePossession',key:'provePossession',note:'per proof'},
-    {label:'nextProvingPeriod',key:'nextProvingPeriod',note:'per period'},
-    {label:'addPieces ×1',key:'addPieces_1',note:'per tx'},
-    {label:'addPieces ×10',key:'addPieces_10',note:'per tx',fallback:778e6},
-    {label:'createDataSet',key:'createDataSet',note:cdn?'CDN':'no CDN'},
-    {label:'terminateService',key:'terminateService',note:cdn?'CDN':'no CDN'},
-    {label:'removePieces ×1',key:'removePieces_1',note:'per tx'},
+    {label:'provePossession',          key:'provePossession',          note:'per proof'},
+    {label:'nextProvingPeriod',        key:'nextProvingPeriod',        note:'per period'},
+    {label:'addPieces ×1 (standalone)',key:'addPieces_1',              note:'per tx'},
+    {label:'addPieces ×10 (model)',    key:'addPieces_10',             note:'extrapolated'},
+    {label:'createDataSet + 1 piece',  key:cdn?'createDataSet_combined_cdn':'createDataSet_combined_noCdn', note:cdn?'observed CDN':'observed no-CDN'},
+    {label:'createDataSet only',       key:cdn?'createDataSet_only_cdn':'createDataSet_only_noCdn', note:'reconstructed'},
+    {label:'terminateService',         key:cdn?'terminateService_cdn':'terminateService_noCdn',   note:cdn?'CDN':'no CDN'},
+    {label:'removePieces ×1',          key:'removePieces_1',           note:'per tx'},
   ];
-  const ADD_FALLBACKS = {'addPieces_1':281.5e6,'addPieces_2':295e6,'addPieces_5':469e6,'addPieces_10':778e6};
-  document.getElementById('gas-ref-grid').innerHTML = ops.map(({label,key,note,fallback})=>{
-    let gas = GAS[key] || fallback || ADD_FALLBACKS[key] || 0;
-    if (key==='createDataSet' && cdn) gas += 45e6;
-    if (key==='terminateService' && cdn) gas += 105e6;
+  document.getElementById('gas-ref-grid').innerHTML = ops.map(({label,key,note})=>{
+    const {value:gas, freshness} = getValueWithFreshness(key);
     const fil = gasCostFIL(gas);
     return `<div class="gas-ref-card">
+      <div class="freshness ${freshness}">${freshness}</div>
       <div class="grc-label">${label}</div>
       <div class="grc-gas">${fmtGas(gas)}</div>
       <div class="grc-fil">${fmtFIL(fil)}</div>
@@ -762,23 +906,27 @@ async function loadGasData() {
 
   // Full reference table
   const refOps = [
-    {op:'provePossession',     gas:GAS.provePossession||190e6,  who:'SP',     when:'Daily (once per dataset)'},
-    {op:'nextProvingPeriod',   gas:GAS.nextProvingPeriod||124e6,who:'SP',     when:'Daily (once per dataset)'},
-    {op:'addPieces ×1',        gas:GAS.addPieces_1||281e6,      who:'Client', when:'Per upload batch'},
-    {op:'addPieces ×2',        gas:GAS.addPieces_2||295e6,      who:'Client', when:'Per upload batch'},
-    {op:'addPieces ×5',        gas:GAS.addPieces_5||469e6,      who:'Client', when:'Per upload batch'},
-    {op:'addPieces ×10',       gas:GAS.addPieces_10||778e6,     who:'Client', when:'Per upload batch'},
-    {op:'removePieces ×1',     gas:GAS.removePieces_1||407e6,   who:'Client', when:'Per removal batch'},
-    {op:'createDataSet (no CDN)', gas:GAS.createDataSet||796e6, who:'Client', when:'Once per dataset'},
-    {op:'createDataSet (CDN)', gas:(GAS.createDataSet||796e6)+45e6,'who':'Client',when:'Once per dataset'},
-    {op:'terminateService (no CDN)',gas:GAS.terminateService||136e6,'who':'Client',when:'Once per dataset'},
-    {op:'terminateService (CDN)', gas:(GAS.terminateService||136e6)+105e6,'who':'Client',when:'Once per dataset'},
+    {op:'provePossession',                key:'provePossession',                who:'SP',     when:'Daily (once per dataset)'},
+    {op:'nextProvingPeriod',              key:'nextProvingPeriod',              who:'SP',     when:'Daily (once per dataset)'},
+    {op:'addPieces ×1 (standalone)',      key:'addPieces_1',                    who:'Client', when:'Per upload batch'},
+    {op:'addPieces ×2 (standalone)',      key:'addPieces_2',                    who:'Client', when:'Per upload batch'},
+    {op:'addPieces ×5 (standalone)',      key:'addPieces_5',                    who:'Client', when:'Per upload batch'},
+    {op:'addPieces ×10 (model)',          key:'addPieces_10',                   who:'Client', when:'Per upload batch'},
+    {op:'removePieces ×1',                key:'removePieces_1',                 who:'Client', when:'Per removal batch'},
+    {op:'createDataSet + 1 piece (no CDN)', key:'createDataSet_combined_noCdn', who:'Client', when:'Once per dataset'},
+    {op:'createDataSet + 1 piece (CDN)',  key:'createDataSet_combined_cdn',     who:'Client', when:'Once per dataset'},
+    {op:'createDataSet only — no CDN (reconstructed)', key:'createDataSet_only_noCdn', who:'Client', when:'Sybil-defense reference'},
+    {op:'createDataSet only — CDN (reconstructed)',    key:'createDataSet_only_cdn',   who:'Client', when:'Sybil-defense reference'},
+    {op:'terminateService (no CDN)',      key:'terminateService_noCdn',         who:'Client', when:'Once per dataset'},
+    {op:'terminateService (CDN)',         key:'terminateService_cdn',           who:'Client', when:'Once per dataset'},
   ];
-  document.getElementById('ref-tbody').innerHTML = refOps.map(({op,gas,who,when})=>{
+  document.getElementById('ref-tbody').innerHTML = refOps.map(({op,key,who,when})=>{
+    const {value:gas, freshness} = getValueWithFreshness(key);
     const fil=gasCostFIL(gas);
     const whoClass = who==='SP'?'tag-sp':'tag-client';
+    const fc = freshness==='live' ? 'var(--green)' : freshness==='cached' ? 'var(--yellow)' : 'var(--red)';
     return `<tr>
-      <td style="font-weight:500;color:var(--text)">${op}</td>
+      <td style="font-weight:500;color:var(--text)">${op} <span style="color:${fc};font-size:9px;text-transform:uppercase;font-weight:700;margin-left:4px">${freshness}</span></td>
       <td class="tr mono">${fmtGas(gas)}</td>
       <td class="tr mono">${fmtFIL(fil)}</td>
       <td class="tr mono">${fmtUSD(fil*filPrice)}</td>
@@ -813,50 +961,58 @@ function recalc() {
   const nRem   = parseInt(document.getElementById('inp-rem').value)||0;
   const cdn    = isCDN();
 
-  // sync second period input
   document.getElementById('inp-days2').value = days;
 
-  const ppG    = MODEL_ALPHA + MODEL_BETA * Math.log2(Math.max(1,nPcs));
-  const ppGas  = ppG; // use model (depends on N=pieces), not live avg
-  const nppGas = GAS?.nextProvingPeriod || NPP_GAS;
+  const ppGas  = MODEL_ALPHA + MODEL_BETA * Math.log2(Math.max(1,nPcs));
+  const nppGas = getValueWithFreshness('nextProvingPeriod').value;
 
-  // Observed mainnet values as fallback (from BATCH_DATA)
-  const ADD_OBS = {1:281.5e6,2:295e6,3:340e6,5:469e6,9:719e6,10:778e6};
-  // addPieces: live FOC data → 90d observed fallback → linear model
   const ADD_OBS_90D = {1:309.1e6,2:378.5e6,3:460.2e6,4:544.2e6,5:625.2e6,6:703.1e6,7:774.8e6,8:853.5e6,9:929.0e6};
-  let addBatchGas;
-  if (GAS && GAS['addPieces_'+batch] && GAS['addPieces_'+batch]>0) {
-    addBatchGas = GAS['addPieces_'+batch];
-  } else if (ADD_OBS_90D[batch]) {
-    addBatchGas = ADD_OBS_90D[batch];
-  } else {
-    addBatchGas = addPiecesModel(batch);
+  function getAddPiecesGas(k) {
+    const liveKey = 'addPieces_'+k;
+    const fr = getValueWithFreshness(liveKey);
+    if (fr.value > 0 && fr.freshness !== 'stale') return fr.value;
+    if (ADD_OBS_90D[k]) return ADD_OBS_90D[k];
+    return addPiecesModel(k);
   }
+  const addBatchGas = getAddPiecesGas(batch);
 
-  let createG = (GAS?.createDataSet || 796e6) + (cdn?45e6:0);
-  let termG   = (GAS?.terminateService || 136e6) + (cdn?105e6:0);
+  // Combined create+addPieces(K=1) is what real users pay for the first piece
+  const createCombinedGas = getValueWithFreshness(cdn?'createDataSet_combined_cdn':'createDataSet_combined_noCdn').value;
+  // createDataSet only (reconstructed) shown for reference but not used in flow modeling here
+  const createOnlyGas     = getValueWithFreshness(cdn?'createDataSet_only_cdn':'createDataSet_only_noCdn').value;
 
   const ppTxns   = nDs * days;
   const nppTxns  = nDs * days;
-  const addTxns  = nAdd>0 ? Math.ceil(nAdd/batch) : 0;
-  const remTxns  = nRem>0 ? 1 : 0;
 
+  // Real-world flow: 1 combined create+addPieces(K=1) per dataset (if any pieces added),
+  // then ⌈(nAdd-1)/batch⌉ standalone addPieces tx for remaining pieces.
+  // If nAdd = 0, no createDataSet/addPieces in this scenario (just proving costs for pre-existing).
+  let createTxns = 0, addTxns = 0;
+  let createTotG = 0, addTotG = 0;
+  if (nAdd > 0) {
+    createTxns = nDs;
+    createTotG = createCombinedGas * createTxns;
+    const remaining = Math.max(0, nAdd - 1); // 1 piece bundled with create
+    addTxns = remaining > 0 ? Math.ceil(remaining/batch) * nDs : 0;
+    addTotG = addBatchGas * addTxns;
+  }
+  const remTxns  = nRem>0 ? 1 : 0;
   const ppTotG   = ppGas   * ppTxns;
   const nppTotG  = nppGas  * nppTxns;
-  const addTotG  = addBatchGas * addTxns;
   const remTotG  = nRem>0 ? remGas(nRem)*remTxns : 0;
-  const totG     = ppTotG+nppTotG+addTotG+remTotG;
+  const totG     = ppTotG+nppTotG+createTotG+addTotG+remTotG;
 
   const toFIL = g => g*egp/1e18;
-  const ppFIL=toFIL(ppTotG), nppFIL=toFIL(nppTotG), addFIL=toFIL(addTotG), remFIL=toFIL(remTotG);
-  const totFIL=ppFIL+nppFIL+addFIL+remFIL;
+  const ppFIL=toFIL(ppTotG), nppFIL=toFIL(nppTotG), createFIL=toFIL(createTotG), addFIL=toFIL(addTotG), remFIL=toFIL(remTotG);
+  const totFIL=ppFIL+nppFIL+createFIL+addFIL+remFIL;
   const toUSD = f => f*filPrice;
 
   // Cost breakdown table
   const rows=[
     ['provePossession',ppTxns,ppGas,ppTotG,ppFIL],
     ['nextProvingPeriod',nppTxns,nppGas,nppTotG,nppFIL],
-    ['addPieces (×'+batch+')',addTxns,addBatchGas,addTotG,addFIL],
+    ['createDataSet + 1 piece (combined)',createTxns,createCombinedGas,createTotG,createFIL],
+    ['addPieces (×'+batch+', remaining pieces)',addTxns,addBatchGas,addTotG,addFIL],
     ['removePieces (×'+nRem+')',remTxns,nRem>0?remGas(nRem):0,remTotG,remFIL],
   ];
   document.getElementById('cost-tbody').innerHTML = rows.map(([op,txns,gpt,tg,fil])=>`
@@ -871,10 +1027,12 @@ function recalc() {
   document.getElementById('tot-usd').textContent = fmtUSD(toUSD(totFIL));
   document.getElementById('breakdown-sub').textContent = days+'d · '+nDs+' datasets · EGP '+egp.toLocaleString()+' attoFIL/gas';
 
-  // Cost detail (burn + tip)
+  // Cost detail
   const detailOps=[
     {op:'provePossession/tx', gas:ppGas},
     {op:'nextProvingPeriod/tx', gas:nppGas},
+    {op:'create+1piece/tx', gas:createCombinedGas},
+    {op:'createDataSet only (ref.)', gas:createOnlyGas},
     {op:'addPieces ×'+batch+'/tx', gas:addBatchGas},
   ];
   if(nRem>0) detailOps.push({op:'removePieces ×'+nRem+'/tx', gas:remGas(nRem)});
@@ -893,28 +1051,26 @@ function recalc() {
   const dailyPct = (dailyG/GAS_TARGET*100).toFixed(4);
   const dailyFIL = toFIL(dailyG);
   const perDsMonth = toFIL((ppGas+nppGas)*30);
-  const perPieceFIL = nAdd>0 ? toFIL(addBatchGas)/batch : 0;
+  const perPieceFIL = nAdd>0 ? toFIL(addTotG+createTotG)/nAdd : 0;
   document.getElementById('sum-daily-gas').textContent = fmtGas(dailyG);
   document.getElementById('sum-daily-pct').textContent = dailyPct+'% of daily gas target';
   document.getElementById('sum-daily-fil').textContent = fmtFIL(dailyFIL);
   document.getElementById('sum-daily-usd').textContent = fmtUSD(toUSD(dailyFIL))+'/day';
   document.getElementById('sum-per-ds').textContent    = fmtUSD(toUSD(perDsMonth));
   document.getElementById('sum-per-piece').textContent = nAdd>0?fmtFIL(perPieceFIL):'—';
-  document.getElementById('sum-per-piece-sub').textContent = nAdd>0?fmtUSD(toUSD(perPieceFIL))+'/piece · batch ×'+batch:'no uploads';
+  document.getElementById('sum-per-piece-sub').textContent = nAdd>0?fmtUSD(toUSD(perPieceFIL))+'/piece (incl. create) · batch ×'+batch:'no uploads';
 
-  // Floor price
   const floorFIL = (ppGas+nppGas)*egp/1e18*filPrice*30;
   document.getElementById('floor-price-val').textContent = '$'+floorFIL.toFixed(4);
   document.getElementById('floor-price-sub').textContent = ' per dataset per 30 days ('+nPcs+' pieces)';
 
-  // USD bar chart
   drawCostChart(
-    ['provePossession','nextProvingPeriod','addPieces','removePieces'],
-    [toUSD(ppFIL),toUSD(nppFIL),toUSD(addFIL),toUSD(remFIL)]
+    ['provePossession','nextProvingPeriod','create+add','addPieces','removePieces'],
+    [toUSD(ppFIL),toUSD(nppFIL),toUSD(createFIL),toUSD(addFIL),toUSD(remFIL)]
   );
 
-  // Update ref table prices when filPrice/egp changes
-  if(GAS) loadGasData();
+  // Refresh ref table when prices change but data stays same
+  if(GAS) renderGasGrid();
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
@@ -922,6 +1078,8 @@ async function init() {
   document.getElementById('status-txt').textContent = 'Loading...';
   onGasFeeChange();
   renderBatchTable();
+  // Render once with cached/hardcoded values immediately, then again with live
+  renderGasGrid();
   await Promise.allSettled([loadFILPrice(), loadGasData(), loadHistEGP()]);
   recalc();
   document.querySelector('details')?.addEventListener('toggle', function() {
@@ -931,10 +1089,7 @@ async function init() {
     const el=document.getElementById('methodology');
     if(el){
       el.open=true;
-      // Wait for page to fully render before scrolling
-      setTimeout(()=>{
-        el.scrollIntoView({behavior:'smooth',block:'start'});
-      }, 800);
+      setTimeout(()=>{ el.scrollIntoView({behavior:'smooth',block:'start'}); }, 800);
     }
   }
   document.getElementById('status-txt').textContent = 'Live · '+new Date().toLocaleTimeString();
