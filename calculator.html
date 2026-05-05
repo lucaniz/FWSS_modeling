@@ -422,7 +422,7 @@ table.bt tfoot td { padding:9px 14px; font-weight:700; color:var(--text); backgr
         <div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:10px">Gas scales logarithmically with piece count N (number of Merkle roots). provePossession traverses a Sum Tree of depth log₂(N) on-chain — 5 challenges × O(log₂N) SLOAD operations. Piece <em>size</em> (leafCount) is irrelevant — it's a value in Sum Tree nodes for proportional sampling, not tree depth.</div>
         <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 16px;font-family:var(--mono);font-size:13px;margin-bottom:12px">
           gas = 158.67M + 8.485M × log₂(pieces)<br>
-          <span style="font-size:11px;color:var(--text3)">R² = 0.9551 · MAE = 10.4M gas · 235 real mainnet datasets · refitted daily</span>
+          <span style="font-size:11px;color:var(--text3)">R² = 0.9551 · MAE = 4.8M gas · 670 real mainnet datasets · refitted daily</span>
         </div>
         <canvas id="pp-chart" width="700" height="200" style="width:100%;max-width:700px;border:1px solid var(--border);border-radius:8px;background:var(--bg)"></canvas>
         <div style="font-size:11px;color:var(--text3);margin-top:4px">Binned averages from real mainnet datasets (FOC Observer). Note: the model tends to overestimate gas for medium piece counts — the real distribution is flatter than the log₂ curve suggests, possibly due to SP-specific optimizations.</div>
@@ -442,7 +442,7 @@ table.bt tfoot td { padding:9px 14px; font-weight:700; color:var(--text); backgr
 
 <script>
 // ── Constants ─────────────────────────────────────────────────────────────────
-const MODEL_ALPHA = 161430060.11, MODEL_BETA = 5915134.545, NPP_GAS = 124e6;
+const MODEL_ALPHA = 158.67e6, MODEL_BETA = 8.485e6, NPP_GAS = 153e6;
 const GAS_TARGET  = 70560e9;
 const TIPSET      = 24.5e9;
 
@@ -467,8 +467,8 @@ const FIP_REGIMES = {
 // K=1..9: observed mainnet values (90d avg from FOC Observer)
 // K>9: linear extrapolation using fitted model
 // K>310: exceeds tipset budget (24.5 Bgas) → tx stuck forever
-const ADD_MODEL_ALPHA = 177388622.80;
-const ADD_MODEL_BETA = 59495037.04;
+const ADD_MODEL_ALPHA = 228.72e6;
+const ADD_MODEL_BETA  = 78.20e6;
 function addPiecesModel(k) { return ADD_MODEL_ALPHA + ADD_MODEL_BETA * k; }
 
 const BATCH_DATA = [
@@ -824,7 +824,7 @@ function recalc() {
   // Observed mainnet values as fallback (from BATCH_DATA)
   const ADD_OBS = {1:281.5e6,2:295e6,3:340e6,5:469e6,9:719e6,10:778e6};
   // addPieces: live FOC data → 90d observed fallback → linear model
-  const ADD_OBS_90D = {1:309.1e6,2:378.5e6,3:460.2e6,4:544.2e6,5:625.2e6,6:703.1e6,7:774.8e6,8:853.5e6,9:929.0e6};
+  const ADD_OBS_90D = {1:310.7e6, 2:378.5e6, 3:460.2e6, 4:544.2e6, 5:625.2e6, 6:703.1e6, 7:774.8e6, 8:853.5e6, 9:929.0e6};
   let addBatchGas;
   if (GAS && GAS['addPieces_'+batch] && GAS['addPieces_'+batch]>0) {
     addBatchGas = GAS['addPieces_'+batch];
@@ -943,5 +943,15 @@ async function init() {
 
 init();
 </script>
+
+  <!-- Protocol upgrade note -->
+  <div style="background:var(--orange-bg,#fff7ed);border:1px solid var(--orange-b,#fed7aa);border-radius:8px;padding:12px 16px;font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:16px">
+    <strong>⚠ Gas costs increased after FWSS v1.2.0 upgrade (23 Mar 2026):</strong><br>
+    createDataSet: ~250M (Nov 2025) → ~1,106M (Apr 2026) after the upgrade.<br>
+    nextProvingPeriod: ~113M (Nov 2025) → ~153M (Apr 2026) as more datasets/CDN rails increase FilecoinPay settlement cost.<br>
+    Always use live data from FOC Observer (click Refresh) for current values — hardcoded fallbacks reflect the post-upgrade era.
+    Future contract upgrades may further change these values.
+  </div>
+
 </body>
 </html>
