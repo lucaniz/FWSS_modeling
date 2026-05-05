@@ -379,8 +379,8 @@ table.st tbody tr:hover td { background: var(--bg); }
 <script>
 const GAS_TARGET  = 70560e9;  // gas units
 const TIPSET      = 24.5e9;   // gas units
-const ADD_MODEL_ALPHA = 177388622.80;
-const ADD_MODEL_BETA = 59495037.04;
+const ADD_MODEL_ALPHA = 228.72e6;
+const ADD_MODEL_BETA  = 78.20e6;
 const CREATE_GAS  = 796e6;
 const TERM_GAS    = 136e6;
 const NPP_BASE    = 124e6;
@@ -527,7 +527,17 @@ updateAll();
     Today: BaseFee ≈ 100 attoFIL, GasPremium ≈ 252k — SP tip dominates (99.9%). 
     <strong>FIP-0115</strong> (Draft): BaseFee would rise to ~90% of EGP.
     CDN datasets use 3 payment rails (+45M gas on createDataSet, +105M on terminateService).
-    Data source: <a href="https://foc-observer.va.gg" target="_blank" style="color:var(--blue,#3b6ff5)">FOC Observer</a> mainnet.
+    Data source: <a href="https://foc-observer.va.gg" target="_blank" style="color:var(--blue,#3b6ff5)">FOC Observer</a> mainnet. addPieces: 228.72M + 78.20M×K. K&gt;310: stuck forever. Overestimation burn: penalty for GasLimit over-declaration &gt;10%, scales with BaseFee.
+  </div>
+
+
+  <!-- Protocol upgrade note -->
+  <div style="background:var(--orange-bg,#fff7ed);border:1px solid var(--orange-b,#fed7aa);border-radius:8px;padding:12px 16px;font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:16px">
+    <strong>⚠ Gas costs increased after FWSS v1.2.0 upgrade (23 Mar 2026):</strong><br>
+    createDataSet: ~250M (Nov 2025) → ~1,106M (Apr 2026) after the upgrade.<br>
+    nextProvingPeriod: ~113M (Nov 2025) → ~153M (Apr 2026) as more datasets/CDN rails increase FilecoinPay settlement cost.<br>
+    Always use live data from FOC Observer (click Refresh) for current values — hardcoded fallbacks reflect the post-upgrade era.
+    Future contract upgrades may further change these values.
   </div>
 
 </body>
