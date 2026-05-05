@@ -428,5 +428,16 @@ document.addEventListener('DOMContentLoaded', function() {
   loadData();
 });
 </script>
+
+  <!-- Gas model note -->
+  <div style="background:var(--blue-bg,#eef2ff);border:1px solid var(--blue-b,#c7d4fd);border-radius:8px;padding:12px 16px;font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:16px">
+    <strong>Gas fee model:</strong> effective_gas_price = BaseFee + min(GasPremium, GasFeeCap − BaseFee)
+    <a href="https://github.com/filecoin-project/lotus/blob/master/chain/types/message.go" target="_blank" style="color:var(--blue,#3b6ff5)">(Lotus source)</a>.
+    Today: BaseFee ≈ 100 attoFIL, GasPremium ≈ 252k — SP tip dominates (99.9%). 
+    <strong>FIP-0115</strong> (Draft): BaseFee would rise to ~90% of EGP.
+    CDN datasets use 3 payment rails (+45M gas on createDataSet, +105M on terminateService).
+    Data source: <a href="https://foc-observer.va.gg" target="_blank" style="color:var(--blue,#3b6ff5)">FOC Observer</a> mainnet.
+  </div>
+
 </body>
 </html>
