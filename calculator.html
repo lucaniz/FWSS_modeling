@@ -422,7 +422,7 @@ table.bt tfoot td { padding:9px 14px; font-weight:700; color:var(--text); backgr
         <div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:10px">Gas scales logarithmically with piece count N (number of Merkle roots). provePossession traverses a Sum Tree of depth log₂(N) on-chain — 5 challenges × O(log₂N) SLOAD operations. Piece <em>size</em> (leafCount) is irrelevant — it's a value in Sum Tree nodes for proportional sampling, not tree depth.</div>
         <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 16px;font-family:var(--mono);font-size:13px;margin-bottom:12px">
           gas = 158.67M + 8.485M × log₂(pieces)<br>
-          <span style="font-size:11px;color:var(--text3)">R² = 0.9551 · MAE = 4.8M gas · 670 real mainnet datasets · refitted daily</span>
+          <span style="font-size:11px;color:var(--text3)">R² = 0.9551 · MAE = 10.3M gas · 242 real mainnet datasets · refitted daily</span>
         </div>
         <canvas id="pp-chart" width="700" height="200" style="width:100%;max-width:700px;border:1px solid var(--border);border-radius:8px;background:var(--bg)"></canvas>
         <div style="font-size:11px;color:var(--text3);margin-top:4px">Binned averages from real mainnet datasets (FOC Observer). Note: the model tends to overestimate gas for medium piece counts — the real distribution is flatter than the log₂ curve suggests, possibly due to SP-specific optimizations.</div>
@@ -442,7 +442,7 @@ table.bt tfoot td { padding:9px 14px; font-weight:700; color:var(--text); backgr
 
 <script>
 // ── Constants ─────────────────────────────────────────────────────────────────
-const MODEL_ALPHA = 158.67e6, MODEL_BETA = 8.485e6, NPP_GAS = 153e6;
+const MODEL_ALPHA = 161577072.18, MODEL_BETA = 5917371.670, NPP_GAS = 1.53e+08;
 const GAS_TARGET  = 70560e9;
 const TIPSET      = 24.5e9;
 
@@ -467,8 +467,8 @@ const FIP_REGIMES = {
 // K=1..9: observed mainnet values (90d avg from FOC Observer)
 // K>9: linear extrapolation using fitted model
 // K>310: exceeds tipset budget (24.5 Bgas) → tx stuck forever
-const ADD_MODEL_ALPHA = 228.72e6;
-const ADD_MODEL_BETA  = 78.20e6;
+const ADD_MODEL_ALPHA = 177498034.80;
+const ADD_MODEL_BETA = 59480117.22;
 function addPiecesModel(k) { return ADD_MODEL_ALPHA + ADD_MODEL_BETA * k; }
 
 const BATCH_DATA = [
