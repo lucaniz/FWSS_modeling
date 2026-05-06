@@ -290,7 +290,7 @@ table.dist tr:last-child td { border-bottom: none; }
 const FOC = 'https://foc-observer.va.gg';
 const GAS_TARGET_GGAS = 70560;
 const NON_FWSS_TODAY  = 15327; // Ggas
-const AVG_GAS_PER_DS  = 323;   // Ggas/day weighted avg
+let AVG_GAS_PER_DS  = 323;   // Ggas/day weighted avg — recomputed from live PP+NPP
 
 const SCENARIOS = {
   today:  { bg: 15327, note: 'Current live network load — Filecoin is near its all-time low utilisation. Base fee at protocol floor (100 attoFIL).' },
@@ -311,12 +311,14 @@ function setScenario(key, btn) {
   updateScenario();
 }
 
+// Gas model constants (updated by refit daily + live on Refresh)
+let PP_ALPHA = 158670000.00;  // auto-refit daily
+let PP_BETA  = 8485000.000;   // auto-refit daily
+let NPP_LIVE = 153e6;         // nextProvingPeriod 30d avg
+
 function gasPerDataset(nPieces) {
-  // provePossession: 158.67M + 8.485M * log2(N)
-  // nextProvingPeriod: 124M
-  // both happen once per day
-  const pp  = 158.67e6 + 8.485e6 * Math.log2(Math.max(1, nPieces));
-  const npp = 124e6;
+  const pp  = PP_ALPHA + PP_BETA * Math.log2(Math.max(1, nPieces));
+  const npp = NPP_LIVE;
   return pp + npp; // gas/day per dataset
 }
 
@@ -358,7 +360,7 @@ function updateScenario() {
   }
 }
 
-async function loadData() {
+async async function loadData() {
   try {
     // Active datasets
     const r = await fetch(FOC + '/sql', {
@@ -377,6 +379,25 @@ async function loadData() {
     const pct = (dailyGasGgas / GAS_TARGET_GGAS * 100).toFixed(3);
     const hwGgas = GAS_TARGET_GGAS - NON_FWSS_TODAY - dailyGasGgas;
     const maxDs = Math.floor((GAS_TARGET_GGAS - NON_FWSS_TODAY) * 1e9 / (AVG_GAS_PER_DS * 1e6));
+
+    // Fetch live NPP gas constant
+    try {
+      const rNPP = await fetch(FOC + '/sql', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          sql: `SELECT ROUND(AVG(gas_used)) AS avg_gas, COUNT(*) AS n FROM pdp_next_proving_period WHERE timestamp >= EXTRACT(EPOCH FROM NOW()) - 86400*30`,
+          network:'mainnet'
+        })
+      });
+      const dNPP = await rNPP.json();
+      const nppGas = parseFloat(dNPP.rows[0]?.avg_gas);
+      const nppN   = parseInt(dNPP.rows[0]?.n);
+      if (nppGas && nppN >= 100) {
+        NPP_LIVE = nppGas;
+        // Recompute AVG_GAS_PER_DS with updated NPP (using avg 229 pieces/dataset)
+        AVG_GAS_PER_DS = gasPerDataset(229) / 1e6; // Mgas → used as Ggas in capacity
+      }
+    } catch(e) { console.warn('NPP fetch failed', e); }
 
     document.getElementById('s-ds').textContent         = activeDs.toLocaleString();
     document.getElementById('s-daily-gas').textContent  = dailyGasGgas.toFixed(1) + ' Ggas';
