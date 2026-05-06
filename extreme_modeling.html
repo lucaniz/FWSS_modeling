@@ -138,9 +138,9 @@ td:first-child{color:var(--text);font-family:var(--mono);font-weight:600;font-si
 <div class="nav">
   <span class="nav-title">FWSS</span>
   <a href="index.html" class="nav-link">← Index</a>
-  <a href="calculator.html" class="nav-link">Gas Calculator</a>
+  <a href="calculator.html" class="nav-link">Calculator</a>
   <a href="capacity.html" class="nav-link">Capacity</a>
-  <button id="refresh-btn" onclick="fetchGasConstants()" style="margin-left:auto;padding:4px 12px;border:1px solid var(--blue);background:var(--blue-bg);color:var(--blue);border-radius:6px;font-size:12px;cursor:pointer;font-family:var(--sans)">Refresh</button>
+  <button id="refresh-btn" class="nav-link" onclick="fetchGasConstants()">↺ Refresh</button>
 </div>
 
 <div class="page-header">
@@ -464,19 +464,19 @@ const TIPSET_GGAS = GAS_TARGET / 2880;
 const TIPSET      = TIPSET_GGAS * 1e9;
 
 // provePossession (auto-refit daily)
-const PP_A = 161577072.18;
-const PP_B = 5917371.670;
+const PP_A = 158670000.00;
+const PP_B = 8485000.000;
 
 // addPieces (auto-refit daily, R²=0.9996, K=1..10 observed mainnet)
-const ADD_MODEL_ALPHA = 177498034.80;
-const ADD_MODEL_BETA = 59480117.22;
+const ADD_MODEL_ALPHA = 228720000.00;
+const ADD_MODEL_BETA  = 78200000.00;
 
 // Other ops (30d mainnet avg, EGP-based costs)
-const NPP = 1.53e+08;   // nextProvingPeriod
-const CR0 = 1.12e+09;  // createDataSet no CDN
-const CR1 = 1.17e+09;  // createDataSet CDN (~+45M)
-const TR0 = 1.37e+08;   // terminateService no CDN
-const TR1 = 2.57e+08;   // terminateService CDN
+const NPP = 153e6;   // nextProvingPeriod
+const CR0 = 1123e6;  // createDataSet no CDN
+const CR1 = 1168e6;  // createDataSet CDN (~+45M)
+const TR0 = 137e6;   // terminateService no CDN
+const TR1 = 257e6;   // terminateService CDN
 
 // Stuck threshold
 const K_ADD_STUCK = Math.floor((TIPSET - ADD_MODEL_ALPHA) / ADD_MODEL_BETA); // = 310
