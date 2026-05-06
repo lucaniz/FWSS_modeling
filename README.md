@@ -105,8 +105,3 @@ Clicking **Refresh** in any tool also fetches live values from FOC Observer dire
 All gas data from **[FOC Observer](https://foc-observer.va.gg)** — Filecoin mainnet, indexed from PDPVerifier and FWSS contract events. REST API at `https://foc-observer.va.gg/sql` (CORS enabled, no auth required).
 
 ---
-
-## Related
-
-- [pdp_gas_modeling](https://github.com/lucaniz/pdp_gas_modeling) — older single-page calculator (pre-FWSS v1.2.0)
-- [filecoin-services #468](https://github.com/FilOzone/filecoin-services/issues/468) — pricing model rationale (uses data from this repo)
