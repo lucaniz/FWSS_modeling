@@ -421,7 +421,7 @@ table.bt tfoot td { padding:9px 14px; font-weight:700; color:var(--text); backgr
         <div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:10px">Gas scales logarithmically with piece count N (number of Merkle roots). provePossession traverses a Sum Tree of depth log₂(N) on-chain — 5 challenges × O(log₂N) SLOAD operations. Piece <em>size</em> (leafCount) is irrelevant — it's a value in Sum Tree nodes for proportional sampling, not tree depth.</div>
         <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 16px;font-family:var(--mono);font-size:13px;margin-bottom:12px">
           gas = 158.67M + 8.485M × log₂(pieces)<br>
-          <span style="font-size:11px;color:var(--text3)">R² = 0.9551 · MAE = 10.4M gas · 253 real mainnet datasets · refitted daily</span>
+          <span style="font-size:11px;color:var(--text3)">R² = 0.9551 · MAE = 10.2M gas · 254 real mainnet datasets · refitted daily</span>
         </div>
         <canvas id="pp-chart" width="700" height="200" style="width:100%;max-width:700px;border:1px solid var(--border);border-radius:8px;background:var(--bg)"></canvas>
         <div style="font-size:11px;color:var(--text3);margin-top:4px">Binned averages from real mainnet datasets (FOC Observer). Note: the model tends to overestimate gas for medium piece counts — the real distribution is flatter than the log₂ curve suggests, possibly due to SP-specific optimizations.</div>
@@ -441,7 +441,7 @@ table.bt tfoot td { padding:9px 14px; font-weight:700; color:var(--text); backgr
 
 <script>
 // ── Constants ─────────────────────────────────────────────────────────────────
-const MODEL_ALPHA = 160954522.21, MODEL_BETA = 6117849.948, NPP_GAS = 1.42e+08;
+const MODEL_ALPHA = 161335408.48, MODEL_BETA = 6105405.885, NPP_GAS = 1.46e+08;
 const GAS_TARGET  = 70560e9;
 const TIPSET      = 24.5e9;
 
@@ -467,7 +467,7 @@ const FIP_REGIMES = {
 // K>9: linear extrapolation using fitted model
 // K>310: exceeds tipset budget (24.5 Bgas) → tx stuck forever
 const ADD_MODEL_ALPHA = -380851918.96;
-const ADD_MODEL_BETA = 176339958.46;
+const ADD_MODEL_BETA = 176337625.00;
 function addPiecesModel(k) { return ADD_MODEL_ALPHA + ADD_MODEL_BETA * k; }
 
 const BATCH_DATA = [
