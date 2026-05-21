@@ -312,9 +312,9 @@ function setScenario(key, btn) {
 }
 
 // Gas model constants (updated by refit daily + live on Refresh)
-let PP_ALPHA = 161589522.61;  // auto-refit daily
-let PP_BETA = 6102796.179;   // auto-refit daily
-let NPP_LIVE = 1.54e+08;         // nextProvingPeriod 30d avg
+let PP_ALPHA = 161722874.68;  // auto-refit daily
+let PP_BETA = 6096718.888;   // auto-refit daily
+let NPP_LIVE = 1.56e+08;         // nextProvingPeriod 30d avg
 
 function gasPerDataset(nPieces) {
   const pp  = PP_ALPHA + PP_BETA * Math.log2(Math.max(1, nPieces));
