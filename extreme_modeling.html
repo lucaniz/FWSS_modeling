@@ -464,19 +464,19 @@ const TIPSET_GGAS = GAS_TARGET / 2880;
 const TIPSET      = TIPSET_GGAS * 1e9;
 
 // provePossession (auto-refit daily)
-const PP_A = 160918903.17;
-const PP_B = 6348109.764;
+const PP_A = 160864697.00;
+const PP_B = 6389548.879;
 
 // addPieces (auto-refit daily, R²=0.9996, K=1..10 observed mainnet)
 const ADD_MODEL_ALPHA = -380851918.96;
-const ADD_MODEL_BETA = 177611304.41;
+const ADD_MODEL_BETA = 177608977.16;
 
 // Other ops (30d mainnet avg, EGP-based costs)
-const NPP = 1.94e+08;   // nextProvingPeriod
-const CR0 = 1.15e+09;  // createDataSet no CDN
-const CR1 = 2.91e+09;  // createDataSet CDN (~+45M)
+const NPP = 1.98e+08;   // nextProvingPeriod
+const CR0 = 1.14e+09;  // createDataSet no CDN
+const CR1 = 2.84e+09;  // createDataSet CDN (~+45M)
 const TR0 = 9.50e+08;   // terminateService no CDN
-const TR1 = 2.64e+08;   // terminateService CDN
+const TR1 = 2.66e+08;   // terminateService CDN
 
 // Stuck threshold
 const K_ADD_STUCK = Math.floor((TIPSET - ADD_MODEL_ALPHA) / ADD_MODEL_BETA); // = 310
